@@ -57,7 +57,7 @@ jobs:
         echo ZALOPAY_ENDPOINT=${{ vars.ZALOPAY_ENDPOINT }} >> .env
 
     - name: Deploy
-      run: pm2 restart efurniture-api
+      run: pm2 restart furnique-api
   
   snyk:
     runs-on: ubuntu-latest
