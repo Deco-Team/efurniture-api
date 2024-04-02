@@ -19,6 +19,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - name: Install PM2 global
+      run: npm install pm2 -g
     - name: Install 
       run: npm install
     - name: Build
