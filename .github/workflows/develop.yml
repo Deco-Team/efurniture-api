@@ -82,9 +82,7 @@ jobs:
           echo ZALOPAY_KEY1=${{ secrets.ZALOPAY_KEY1 }} >> .env
           echo ZALOPAY_KEY2=${{ secrets.ZALOPAY_KEY2 }} >> .env
           echo ZALOPAY_ENDPOINT=${{ vars.ZALOPAY_ENDPOINT }} >> .env
-          echo PAYOS_CLIENT_ID=${{ secrets.PAYOS_CLIENT_ID }} >> .env
-          echo PAYOS_API_KEY=${{ secrets.PAYOS_API_KEY }} >> .env
-          echo PAYOS_CHECKSUM_KEY=${{ secrets.PAYOS_CHECKSUM_KEY }} >> .env
+
           echo SENTRY_DSN=${{ secrets.SENTRY_DSN }} >> .env
 
       - name: Deploy
