@@ -29,7 +29,11 @@ export default () => ({
       clientId: process.env.PAYOS_CLIENT_ID,
       apiKey: process.env.PAYOS_API_KEY,
       checksumKey: process.env.PAYOS_CHECKSUM_KEY,
-    }
+    },
+  },
+  discord: {
+    webhookId: process.env.DISCORD_WEBHOOK_ID,
+    webhookToken: process.env.DISCORD_WEBHOOK_TOKEN,
   },
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'accessSecret',
   JWT_ACCESS_EXPIRATION: process.env.JWT_ACCESS_EXPIRATION || 864000, // seconds

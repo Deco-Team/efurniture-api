@@ -3,19 +3,19 @@ import { BaseExceptionFilter } from '@nestjs/core'
 import * as _ from 'lodash'
 import { AppException } from '@common/exceptions/app.exception'
 import { captureException as sentryCaptureException } from '@sentry/node'
+import { DiscordService } from '@common/services/discord.service'
 
 @Catch()
 export class AppExceptionFilter extends BaseExceptionFilter {
   private appLogger: LoggerService
-  constructor(logger: LoggerService) {
+  private discordService: DiscordService
+  constructor(logger: LoggerService, discordService: DiscordService) {
     super()
     this.appLogger = logger
+    this.discordService = discordService
   }
 
   catch(exception: any, host: ArgumentsHost): void {
-    // Sentry
-    sentryCaptureException(exception)
-
     const ctx = host.switchToHttp()
     const response = ctx.getResponse()
     const { error, httpStatus, message, data } = this._parseError(exception)
@@ -26,6 +26,32 @@ export class AppExceptionFilter extends BaseExceptionFilter {
         result: data
       }
     })
+    if (httpStatus === HttpStatus.INTERNAL_SERVER_ERROR && process.env.NODE_ENV !== 'local') {
+      // Sentry
+      sentryCaptureException(exception)
+
+      // Discord Bot
+      this.discordService.sendMessage({
+        fields: [
+          {
+            name: 'error',
+            value: error
+          },
+          {
+            name: 'message',
+            value: message
+          },
+          {
+            name: 'data',
+            value: `${JSON.stringify(data).slice(0, 50)}...`
+          },
+          {
+            name: 'stackTrace',
+            value: `${JSON.stringify(exception.stack).slice(0, 50)}...`
+          }
+        ]
+      })
+    }
     if (process.env.NODE_ENV !== 'test') {
       this.appLogger.error(message, exception.stack)
     }

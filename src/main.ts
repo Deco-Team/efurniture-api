@@ -14,6 +14,7 @@ import {
   autoDiscoverNodePerformanceMonitoringIntegrations
 } from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
+import { DiscordService } from '@common/services/discord.service'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -39,9 +40,10 @@ async function bootstrap() {
   app.use(SentryHandlers.tracingHandler())
 
   const logger = app.get(AppLogger)
+  const discordService = app.get(DiscordService)
   app.useLogger(logger)
   app.useGlobalInterceptors(new TransformInterceptor())
-  app.useGlobalFilters(new AppExceptionFilter(logger))
+  app.useGlobalFilters(new AppExceptionFilter(logger, discordService))
   const globalPipes = [new TrimRequestBodyPipe(), new AppValidationPipe()]
   app.useGlobalPipes(...globalPipes)
 
@@ -49,7 +51,7 @@ async function bootstrap() {
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
 
   // add api-docs
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('Furnique Swagger')
       .setDescription('Nestjs API documentation')
