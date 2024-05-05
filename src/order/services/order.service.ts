@@ -163,7 +163,7 @@ export class OrderService {
             amount: totalAmount,
             description: `FUR-Thanh toán đơn hàng`,
             // TODO: Update link below
-            cancelUrl: `${this.configService.get('WEB_URL')}/customer/orders`,
+            cancelUrl: `${this.configService.get('WEB_URL')}/cart`,
             returnUrl: `${this.configService.get('WEB_URL')}/customer/orders`
           }
           checkoutData = await this.paymentService.createTransaction(checkoutRequestType)
