@@ -20,7 +20,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   // Sentry
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'development') { //'production'
     sentryInit({
       dsn: process.env.SENTRY_DSN,
       integrations: [
