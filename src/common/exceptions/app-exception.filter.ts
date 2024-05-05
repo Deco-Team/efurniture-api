@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, HttpException, HttpStatus, LoggerService } from '
 import { BaseExceptionFilter } from '@nestjs/core'
 import * as _ from 'lodash'
 import { AppException } from '@common/exceptions/app.exception'
+import { captureException as sentryCaptureException } from '@sentry/node'
 
 @Catch()
 export class AppExceptionFilter extends BaseExceptionFilter {
@@ -12,6 +13,9 @@ export class AppExceptionFilter extends BaseExceptionFilter {
   }
 
   catch(exception: any, host: ArgumentsHost): void {
+    // Sentry
+    sentryCaptureException(exception)
+
     const ctx = host.switchToHttp()
     const response = ctx.getResponse()
     const { error, httpStatus, message, data } = this._parseError(exception)
