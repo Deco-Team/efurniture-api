@@ -42,7 +42,7 @@ export class PaymentController {
     //1. Validate signature with other data
     const result = this.paymentService.verifyPaymentWebhookData(momoPaymentResponseDto)
     if (!result) return false
-    
+
     //2. Process webhook
     return this.paymentService.processWebhook(PaymentMethod.MOMO, momoPaymentResponseDto)
   }
@@ -55,12 +55,12 @@ export class PaymentController {
     console.log('Handling PAYOS webhook', JSON.stringify(webhookData))
     this.paymentService.setStrategy(PaymentMethod.PAY_OS)
 
+    // just skip for confirmWebhook
+    if (webhookData.data.orderCode == 123) return true
+
     //1. Validate signature with other data
     const result = this.paymentService.verifyPaymentWebhookData(webhookData)
     if (!result) return false
-
-    // // just skip for confirmWebhook
-    // if (webhookData.data.orderCode == 123) return true
 
     //2. Process webhook
     return this.paymentService.processWebhook(PaymentMethod.PAY_OS, webhookData)
@@ -72,7 +72,7 @@ export class PaymentController {
   // @Post('webhook/payos-confirm')
   // async verifyWebhook() {
   //   console.log('Handling Confirm  Webhook URL for PAYOS')
-    
+
   //   await this.paymentService.payOSPaymentStrategy.verifyWebhookUrl()
   // }
 }

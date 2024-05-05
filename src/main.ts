@@ -77,7 +77,7 @@ async function bootstrap() {
   }
 
   // Example: process.env.CORS_VALID_ORIGINS=localhost,ngrok-free => parse to [ /localhost/, /ngrok-free/ ]
-  const origins = process.env.CORS_VALID_ORIGINS.split(',').map((origin) => new RegExp(origin)) || [
+  const origins = process.env.CORS_VALID_ORIGINS?.split(',').map((origin) => new RegExp(origin)) || [
     /localhost/,
     /ngrok-free/
   ]
