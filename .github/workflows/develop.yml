@@ -74,6 +74,10 @@ jobs:
           echo MOMO_SECRET_KEY=${{ secrets.MOMO_SECRET_KEY }} >> .env
           echo MOMO_ENDPOINT=${{ vars.MOMO_ENDPOINT }} >> .env
 
+          echo PAYOS_CLIENT_ID=${{ secrets.PAYOS_CLIENT_ID }} >> .env
+          echo PAYOS_API_KEY=${{ secrets.PAYOS_API_KEY }} >> .env
+          echo PAYOS_CHECKSUM_KEY=${{ secrets.PAYOS_CHECKSUM_KEY }} >> .env
+
           echo ZALOPAY_APP_ID=${{ secrets.ZALOPAY_APP_ID }} >> .env
           echo ZALOPAY_KEY1=${{ secrets.ZALOPAY_KEY1 }} >> .env
           echo ZALOPAY_KEY2=${{ secrets.ZALOPAY_KEY2 }} >> .env

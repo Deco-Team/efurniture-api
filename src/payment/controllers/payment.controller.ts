@@ -55,8 +55,8 @@ export class PaymentController {
     console.log('Handling PAYOS webhook', JSON.stringify(webhookData))
     this.paymentService.setStrategy(PaymentMethod.PAY_OS)
 
-    // just skip for confirmWebhook
-    if (webhookData.data.orderCode == 123) return true
+    // // just skip for confirmWebhook
+    // if (webhookData.data.orderCode == 123) return true
 
     //1. Validate signature with other data
     const result = this.paymentService.verifyPaymentWebhookData(webhookData)
