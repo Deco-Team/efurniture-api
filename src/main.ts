@@ -19,22 +19,21 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   // Sentry
-  if (process.env.NODE_ENV === 'production') {
-    sentryInit({
-      dsn: process.env.SENTRY_DSN,
-      integrations: [
-        // Automatically instrument Node.js libraries and frameworks
-        ...autoDiscoverNodePerformanceMonitoringIntegrations(),
-        // enable HTTP calls tracing
-        new SentryIntegrations.Http({ tracing: true }),
-        nodeProfilingIntegration()
-      ],
-      // Performance Monitoring
-      tracesSampleRate: 1.0, //  Capture 100% of the transactions
-      // Set sampling rate for profiling - this is relative to tracesSampleRate
-      profilesSampleRate: 1.0
-    })
-  }
+  sentryInit({
+    dsn: process.env.SENTRY_DSN,
+    integrations: [
+      // Automatically instrument Node.js libraries and frameworks
+      ...autoDiscoverNodePerformanceMonitoringIntegrations(),
+      // enable HTTP calls tracing
+      new SentryIntegrations.Http({ tracing: true }),
+      nodeProfilingIntegration()
+    ],
+    // Performance Monitoring
+    tracesSampleRate: 1.0, //  Capture 100% of the transactions
+    // Set sampling rate for profiling - this is relative to tracesSampleRate
+    profilesSampleRate: 1.0
+  })
+
   app.use(SentryHandlers.requestHandler())
   app.use(SentryHandlers.tracingHandler())
 

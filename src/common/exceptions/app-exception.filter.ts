@@ -13,12 +13,15 @@ export class AppExceptionFilter extends BaseExceptionFilter {
   }
 
   catch(exception: any, host: ArgumentsHost): void {
-    // Sentry
-    sentryCaptureException(exception)
-
     const ctx = host.switchToHttp()
     const response = ctx.getResponse()
     const { error, httpStatus, message, data } = this._parseError(exception)
+
+    // Sentry
+    if (httpStatus === HttpStatus.INTERNAL_SERVER_ERROR) {
+      sentryCaptureException(exception)
+    }
+
     response.status(httpStatus).json({
       error,
       message,
