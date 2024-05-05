@@ -102,4 +102,27 @@ export class MomoPaymentStrategy implements IPaymentStrategy {
     console.log(data)
     return data
   }
+
+  verifyPaymentWebhookData(momoPaymentResponseDto: any): boolean {
+    const {
+      partnerCode,
+      amount,
+      extraData,
+      message,
+      orderId,
+      orderInfo,
+      orderType,
+      requestId,
+      payType,
+      responseTime,
+      resultCode,
+      transId
+    } = momoPaymentResponseDto
+    const rawSignature = `accessKey=${this.config.accessKey}&amount=${amount}&extraData=${extraData}&message=${message}&orderId=${orderId}&orderInfo=${orderInfo}&orderType=${orderType}&partnerCode=${partnerCode}&payType=${payType}&requestId=${requestId}&responseTime=${responseTime}&resultCode=${resultCode}&transId=${transId}`
+    const signature = this.helperService.createSignature(rawSignature, this.config.secretKey)
+
+    console.log(`1. ${momoPaymentResponseDto.signature}`)
+    console.log(`2. ${signature}`)
+    return momoPaymentResponseDto.signature !== signature
+  }
 }

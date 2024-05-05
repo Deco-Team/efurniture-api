@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { TransactionStatus } from '@common/contracts/constant'
 import { PaymentMethod } from '@payment/contracts/constant'
-import { MomoPaymentResponseDto } from '@payment/dto/momo-payment.dto'
 import { DataResponse, PaginateResponse } from '@common/contracts/openapi-builder'
+import { PayOSPaymentResponseDto } from './payos-payment.dto'
 
 export class PaymentDto {
   @ApiProperty()
@@ -12,12 +12,14 @@ export class PaymentDto {
   transactionStatus: TransactionStatus
 
   @ApiProperty()
-  transaction: MomoPaymentResponseDto
+  transaction: PayOSPaymentResponseDto
 
-  @ApiProperty({ isArray: true, type: MomoPaymentResponseDto })
-  transactionHistory: MomoPaymentResponseDto[]
+  @ApiProperty({ isArray: true, type: PayOSPaymentResponseDto })
+  transactionHistory: PayOSPaymentResponseDto[]
 
-  @ApiProperty()
+  @ApiProperty({
+    enum: PaymentMethod
+  })
   paymentMethod: PaymentMethod
 
   @ApiProperty()

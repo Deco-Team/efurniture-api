@@ -23,7 +23,7 @@ async function bootstrap() {
   // add api-docs
   if (process.env.NODE_ENV === 'development') {
     const config = new DocumentBuilder()
-      .setTitle('eFurniture Swagger')
+      .setTitle('Furnique Swagger')
       .setDescription('Nestjs API documentation')
       .setVersion(process.env.npm_package_version || '1.0.0')
       .addBearerAuth()
@@ -58,6 +58,6 @@ async function bootstrap() {
 
   const port = process.env.PORT || 5000
   await app.listen(port)
-  logger.debug(`🚕 ==>> eFurniture Server is running on port ${port} <<== 🚖`)
+  logger.debug(`🚕 ==>> Furnique Server is running on port ${port} <<== 🚖`)
 }
 bootstrap()

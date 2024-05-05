@@ -14,14 +14,10 @@ import { ProductRepository } from '@product/repositories/product.repository'
 import { PaymentRepository } from '@payment/repositories/payment.repository'
 import { PaymentMethod } from '@payment/contracts/constant'
 import { PaymentService } from '@payment/services/payment.service'
-import {
-  CreateMomoPaymentDto,
-  CreateMomoPaymentResponse,
-  QueryMomoPaymentDto,
-  RefundMomoPaymentDto
-} from '@payment/dto/momo-payment.dto'
+import { CreateMomoPaymentResponse, QueryMomoPaymentDto } from '@payment/dto/momo-payment.dto'
 import { ConfigService } from '@nestjs/config'
 import { MailerService } from '@nestjs-modules/mailer'
+import { CheckoutRequestType, CheckoutResponseDataType, PaymentLinkDataType } from '@payos/node/lib/type'
 
 @Injectable()
 export class OrderService {
@@ -132,29 +128,46 @@ export class OrderService {
       })
 
       // 4. Process transaction
-      let createMomoPaymentResponse: CreateMomoPaymentResponse
-      const orderId = `FUR${new Date().getTime()}${Math.floor(Math.random() * 100)}`
+      let paymentResponseData: CreateMomoPaymentResponse | PaymentLinkDataType
+      let checkoutData: CreateMomoPaymentResponse | CheckoutResponseDataType
+      const MAX_VALUE = 9_007_199_254_740_991
+      const MIM_VALUE = 1_000_000_000_000_000
+      const orderCode = Math.floor(MIM_VALUE + Math.random() * (MAX_VALUE - MIM_VALUE))
+      createOrderDto['paymentMethod'] = PaymentMethod.PAY_OS
       switch (createOrderDto.paymentMethod) {
-        case PaymentMethod.ZALO_PAY:
+        // case PaymentMethod.MOMO:
+        // this.paymentService.setStrategy(PaymentMethod.MOMO)
+        // const createMomoPaymentDto: CreateMomoPaymentDto = {
+        //   partnerName: 'FURNIQUE',
+        //   orderInfo: `Furnique - Thanh toán đơn hàng #${orderCode}`,
+        //   redirectUrl: `${this.configService.get('WEB_URL')}/customer/orders`,
+        //   ipnUrl: `${this.configService.get('SERVER_URL')}/payment/webhook/momo`,
+        //   requestType: 'payWithMethod',
+        //   amount: totalAmount,
+        //   orderId: orderCode.toString(),
+        //   requestId: orderCode.toString(),
+        //   extraData: '',
+        //   autoCapture: true,
+        //   lang: 'vi',
+        //   orderExpireTime: 15
+        // }
+        // paymentResponseData = checkoutData = await this.paymentService.createTransaction(createMomoPaymentDto)
+        // break
+        // case PaymentMethod.ZALO_PAY:
         // implement later
-        case PaymentMethod.MOMO:
+        case PaymentMethod.PAY_OS:
         default:
-          this.paymentService.setStrategy(this.paymentService.momoPaymentStrategy)
-          const createMomoPaymentDto: CreateMomoPaymentDto = {
-            partnerName: 'FURNIQUE',
-            orderInfo: `Furnique - Thanh toán đơn hàng #${orderId}`,
-            redirectUrl: `${this.configService.get('WEB_URL')}/customer/orders`,
-            ipnUrl: `${this.configService.get('SERVER_URL')}/payment/webhook`,
-            requestType: 'payWithMethod',
+          this.paymentService.setStrategy(PaymentMethod.PAY_OS)
+          const checkoutRequestType: CheckoutRequestType = {
+            orderCode: orderCode,
             amount: totalAmount,
-            orderId,
-            requestId: orderId,
-            extraData: '',
-            autoCapture: true,
-            lang: 'vi',
-            orderExpireTime: 15
+            description: `FUR-Thanh toán đơn hàng`,
+            // TODO: Update link below
+            cancelUrl: `${this.configService.get('WEB_URL')}/customer/orders`,
+            returnUrl: `${this.configService.get('WEB_URL')}/customer/orders`
           }
-          createMomoPaymentResponse = await this.paymentService.createTransaction(createMomoPaymentDto)
+          checkoutData = await this.paymentService.createTransaction(checkoutRequestType)
+          paymentResponseData = await this.paymentService.getTransaction(checkoutData['orderCode'])
           break
       }
 
@@ -162,7 +175,8 @@ export class OrderService {
       const payment = await this.paymentRepository.create(
         {
           transactionStatus: TransactionStatus.DRAFT,
-          transaction: createMomoPaymentResponse,
+          transaction: paymentResponseData,
+          transactionHistory: [paymentResponseData],
           paymentMethod: createOrderDto.paymentMethod,
           amount: totalAmount
         },
@@ -175,7 +189,7 @@ export class OrderService {
       await this.orderRepository.create(
         {
           ...createOrderDto,
-          orderId,
+          orderId: orderCode.toString(),
           items: orderItems,
           totalAmount,
           payment
@@ -185,7 +199,7 @@ export class OrderService {
         }
       )
       await session.commitTransaction()
-      return createMomoPaymentResponse
+      return checkoutData
     } catch (error) {
       await session.abortTransaction()
       console.error(error)
@@ -296,65 +310,66 @@ export class OrderService {
       })
       await this.productRepository.model.bulkWrite(operations)
 
-      // 3. Refund payment via MOMO
-      this.logger.log(`3. Refund payment via MOMO::`)
-      const refundOrderId = `FUR${new Date().getTime()}${Math.floor(Math.random() * 100)}`
-      this.paymentService.setStrategy(this.paymentService.momoPaymentStrategy)
-      const refundMomoPaymentDto: RefundMomoPaymentDto = {
-        orderId: refundOrderId,
-        requestId: refundOrderId,
-        amount: order.payment?.amount,
-        transId: order.payment?.transaction['transId'],
-        lang: 'vi',
-        description: `Furnique - Hoàn tiền đơn hàng #${orderId}`
-      }
-      const refundedTransaction = await this.paymentService.refundTransaction(refundMomoPaymentDto)
-      this.logger.log(JSON.stringify(refundedTransaction))
+      // TODO: check if PaymentMethod === MOMO
+      // // 3. Refund payment via MOMO
+      // this.logger.log(`3. Refund payment via MOMO::`)
+      // const refundOrderId = `FUR${new Date().getTime()}${Math.floor(Math.random() * 100)}`
+      // this.paymentService.setStrategy(PaymentMethod.MOMO)
+      // const refundMomoPaymentDto: RefundMomoPaymentDto = {
+      //   orderId: refundOrderId,
+      //   requestId: refundOrderId,
+      //   amount: order.payment?.amount,
+      //   transId: order.payment?.transaction['transId'],
+      //   lang: 'vi',
+      //   description: `Furnique - Hoàn tiền đơn hàng #${orderId}`
+      // }
+      // const refundedTransaction = await this.paymentService.refundTransaction(refundMomoPaymentDto)
+      // this.logger.log(JSON.stringify(refundedTransaction))
 
       // 4. Fetch newest transaction of order
-      this.logger.log(`4. Fetch newest transaction of order`)
-      const queryMomoPaymentDto: QueryMomoPaymentDto = {
-        orderId: order.orderId,
-        requestId: order.orderId,
-        lang: 'vi'
-      }
-      const transaction = await this.paymentService.getTransaction(queryMomoPaymentDto)
-      this.logger.log(JSON.stringify(transaction))
+      // this.logger.log(`4. Fetch newest transaction of order`)
+      // const queryMomoPaymentDto: QueryMomoPaymentDto = {
+      //   orderId: order.orderId,
+      //   requestId: order.orderId,
+      //   lang: 'vi'
+      // }
+      // const transaction = await this.paymentService.getTransaction(queryMomoPaymentDto)
+      // this.logger.log(JSON.stringify(transaction))
 
       // 5. Update payment transactionStatus, transaction
-      this.logger.log(`5. Update payment transactionStatus, transaction`)
-      const payment = await this.paymentRepository.findOneAndUpdate(
-        {
-          _id: order.payment._id
-        },
-        {
-          $set: {
-            transactionStatus: TransactionStatus.REFUNDED,
-            transaction: transaction
-          },
-          $push: { transactionHistory: transaction }
-        },
-        {
-          session,
-          new: true
-        }
-      )
+      // this.logger.log(`5. Update payment transactionStatus, transaction`)
+      // const payment = await this.paymentRepository.findOneAndUpdate(
+      //   {
+      //     _id: order.payment._id
+      //   },
+      //   {
+      //     $set: {
+      //       transactionStatus: TransactionStatus.REFUNDED,
+      //       transaction: transaction
+      //     },
+      //     // $push: { transactionHistory: transaction }
+      //   },
+      //   {
+      //     session,
+      //     new: true
+      //   }
+      // )
       // 6. Update order transactionStatus, payment
-      this.logger.log(`6. Update order transactionStatus, payment`)
-      await this.orderRepository.findOneAndUpdate(
-        {
-          _id: order._id
-        },
-        {
-          $set: {
-            transactionStatus: TransactionStatus.REFUNDED,
-            payment: payment
-          }
-        },
-        {
-          session
-        }
-      )
+      // this.logger.log(`6. Update order transactionStatus, payment`)
+      // await this.orderRepository.findOneAndUpdate(
+      //   {
+      //     _id: order._id
+      //   },
+      //   {
+      //     $set: {
+      //       transactionStatus: TransactionStatus.REFUNDED,
+      //       payment: payment
+      //     }
+      //   },
+      //   {
+      //     session
+      //   }
+      // )
 
       // 7. Send email/notification to customer
       this.logger.log(`7. Send email/notification to customer`)
