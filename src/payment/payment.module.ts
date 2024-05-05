@@ -10,6 +10,7 @@ import { MomoPaymentStrategy } from '@payment/strategies/momo.strategy'
 import { OrderModule } from '@order/order.module'
 import { CartModule } from '@cart/cart.module'
 import { ProductModule } from '@product/product.module'
+import { PayOSPaymentStrategy } from '@payment/strategies/payos.strategy'
 
 @Global()
 @Module({
@@ -21,7 +22,7 @@ import { ProductModule } from '@product/product.module'
     ProductModule
   ],
   controllers: [PaymentController],
-  providers: [PaymentService, PaymentRepository, ZaloPayPaymentStrategy, MomoPaymentStrategy],
+  providers: [PaymentService, PaymentRepository, ZaloPayPaymentStrategy, MomoPaymentStrategy, PayOSPaymentStrategy],
   exports: [PaymentService, PaymentRepository]
 })
 export class PaymentModule {}

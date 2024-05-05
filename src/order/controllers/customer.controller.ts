@@ -12,7 +12,7 @@ import { OrderService } from '@order/services/order.service'
 import { OrderHistoryDto } from '@order/schemas/order.schema'
 import { Pagination, PaginationParams } from '@common/decorators/pagination.decorator'
 import { DataResponse } from '@common/contracts/openapi-builder'
-import { CreateMomoPaymentResponseDto } from '@payment/dto/momo-payment.dto'
+import { CreatePayOSPaymentResponseDto } from '@payment/dto/payos-payment.dto'
 
 @ApiTags('Order - Customer')
 @ApiBearerAuth()
@@ -26,7 +26,7 @@ export class OrderCustomerController {
   @ApiOperation({
     summary: 'Create new order(orderStatus: PENDING, transactionStatus: DRAFT)'
   })
-  @ApiOkResponse({ type: CreateMomoPaymentResponseDto })
+  @ApiOkResponse({ type: CreatePayOSPaymentResponseDto })
   @ApiBadRequestResponse({ type: ErrorResponse })
   async createOrder(@Req() req, @Body() createOrderDto: CreateOrderDto) {
     const { _id, role } = _.get(req, 'user')

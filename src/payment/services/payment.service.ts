@@ -1,11 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { get } from 'lodash'
 import { IPaymentStrategy } from '@payment/strategies/payment-strategy.interface'
-import {
-  CreateMomoPaymentDto,
-  MomoPaymentResponseDto,
-  QueryMomoPaymentDto,
-  RefundMomoPaymentDto
-} from '@payment/dto/momo-payment.dto'
+import { MomoPaymentResponseDto, QueryMomoPaymentDto, RefundMomoPaymentDto } from '@payment/dto/momo-payment.dto'
 import { MomoPaymentStrategy } from '@payment/strategies/momo.strategy'
 import { InjectConnection } from '@nestjs/mongoose'
 import { Connection, FilterQuery } from 'mongoose'
@@ -17,10 +13,13 @@ import { AppException } from '@common/exceptions/app.exception'
 import { Errors } from '@common/contracts/error'
 import { OrderHistoryDto } from '@order/schemas/order.schema'
 import { OrderStatus, TransactionStatus, UserRole } from '@common/contracts/constant'
-import { MomoResultCode } from '@payment/contracts/constant'
+import { MomoResultCode, PayOSResultCode, PaymentMethod } from '@payment/contracts/constant'
 import { PaginationParams } from '@common/decorators/pagination.decorator'
 import { Payment } from '@payment/schemas/payment.schema'
 import { MailerService } from '@nestjs-modules/mailer'
+import { PayOSPaymentStrategy } from '@payment/strategies/payos.strategy'
+import { WebhookType as PayOSWebhookData } from '@payos/node/lib/type'
+import { ZaloPayPaymentStrategy } from '@payment/strategies/zalopay.strategy'
 
 @Injectable()
 export class PaymentService {
@@ -32,15 +31,32 @@ export class PaymentService {
     private readonly cartService: CartService,
     private readonly productRepository: ProductRepository,
     private readonly paymentRepository: PaymentRepository,
-    readonly momoPaymentStrategy: MomoPaymentStrategy,
+    private readonly momoPaymentStrategy: MomoPaymentStrategy,
+    private readonly zaloPayPaymentStrategy: ZaloPayPaymentStrategy,
+    readonly payOSPaymentStrategy: PayOSPaymentStrategy,
     private readonly mailerService: MailerService
   ) {}
 
-  public setStrategy(strategy: IPaymentStrategy) {
-    this.strategy = strategy
+  public setStrategy(paymentMethod: PaymentMethod) {
+    switch (paymentMethod) {
+      case PaymentMethod.MOMO:
+        this.strategy = this.momoPaymentStrategy
+        break
+      case PaymentMethod.ZALO_PAY:
+        this.strategy = this.zaloPayPaymentStrategy
+        break
+      case PaymentMethod.PAY_OS:
+      default:
+        this.strategy = this.payOSPaymentStrategy
+        break
+    }
   }
 
-  public createTransaction(createPaymentDto: CreateMomoPaymentDto) {
+  public verifyPaymentWebhookData(webhookData: any) {
+    return this.strategy.verifyPaymentWebhookData(webhookData)
+  }
+
+  public createTransaction(createPaymentDto: any) {
     return this.strategy.createTransaction(createPaymentDto)
   }
 
@@ -72,24 +88,29 @@ export class PaymentService {
     return result
   }
 
-  public async processWebhook(momoPaymentResponseDto: MomoPaymentResponseDto) {
-    this.logger.log('processWebhook: momoPaymentResponseDto', JSON.stringify(momoPaymentResponseDto))
+  public async processWebhook(paymentMethod: PaymentMethod, webhookData: MomoPaymentResponseDto | PayOSWebhookData) {
+    this.logger.log('processWebhook::', JSON.stringify(webhookData))
     // Execute in transaction
     const session = await this.connection.startSession()
     session.startTransaction()
     try {
       // 1. Get order from orderId
+      const orderId = get(webhookData, 'data.orderCode', get(webhookData, 'orderId'))
+      console.log('orderId', orderId, typeof orderId)
       const order = await this.orderRepository.findOne({
         conditions: {
-          orderId: momoPaymentResponseDto.orderId
+          orderId: String(orderId)
         },
         projection: '+items'
       })
       if (!order) throw new AppException(Errors.ORDER_NOT_FOUND)
       this.logger.log('processWebhook: order', JSON.stringify(order))
 
-      if (momoPaymentResponseDto.resultCode === MomoResultCode.SUCCESS) {
-        this.logger.log('processWebhook: resultCode SUCCESS', momoPaymentResponseDto.resultCode)
+      const isPaymentSuccess =
+        get(webhookData, 'code') === PayOSResultCode.SUCCESS ||
+        get(webhookData, 'resultCode') === MomoResultCode.SUCCESS
+      if (isPaymentSuccess) {
+        this.logger.log('processWebhook: payment SUCCESS')
         // Payment success
         // 1. Fetch product in cart items
         const { _id: cartId, items, totalAmount: cartTotalAmount } = await this.cartService.getCart(order.customer._id)
@@ -156,7 +177,35 @@ export class PaymentService {
         // 6. Bulk write Update quantity in product.variants
         await this.productRepository.model.bulkWrite(operations)
 
-        // 7. Update order transactionStatus
+        // 7.  Update payment transactionStatus, transaction
+        let transaction
+        switch (paymentMethod) {
+          case PaymentMethod.MOMO:
+            transaction = webhookData
+          case PaymentMethod.PAY_OS:
+            this.setStrategy(PaymentMethod.PAY_OS)
+            transaction = await this.getTransaction(get(webhookData, 'data.orderCode'))
+            break
+        }
+
+        const payment = await this.paymentRepository.findOneAndUpdate(
+          {
+            _id: order.payment._id
+          },
+          {
+            $set: {
+              transactionStatus: TransactionStatus.CAPTURED,
+              transaction: transaction
+            },
+            $push: { transactionHistory: transaction }
+          },
+          {
+            session,
+            new: true
+          }
+        )
+
+        // 8. Update order transactionStatus
         const orderHistory = new OrderHistoryDto(
           OrderStatus.PENDING,
           TransactionStatus.CAPTURED,
@@ -170,28 +219,9 @@ export class PaymentService {
           {
             $set: {
               transactionStatus: TransactionStatus.CAPTURED,
-              'payment.transactionStatus': TransactionStatus.CAPTURED,
-              'payment.transaction': momoPaymentResponseDto,
-              'payment.transactionHistory': [momoPaymentResponseDto]
+              payment
             },
             $push: { orderHistory }
-          },
-          {
-            session
-          }
-        )
-
-        // 8.  Update payment transactionStatus, transaction
-        await this.paymentRepository.findOneAndUpdate(
-          {
-            _id: order.payment._id
-          },
-          {
-            $set: {
-              transactionStatus: TransactionStatus.CAPTURED,
-              transaction: momoPaymentResponseDto,
-              transactionHistory: [momoPaymentResponseDto]
-            }
           },
           {
             session
@@ -226,7 +256,25 @@ export class PaymentService {
         // 10. Send notification to staff
       } else {
         // Payment failed
-        this.logger.log('processWebhook: resultCode FAILED', momoPaymentResponseDto.resultCode)
+        this.logger.log('processWebhook: payment FAILED')
+        // 1.  Update payment transactionStatus, transaction
+        const payment = await this.paymentRepository.findOneAndUpdate(
+          {
+            _id: order.payment._id
+          },
+          {
+            $set: {
+              transactionStatus: TransactionStatus.ERROR,
+              transaction: webhookData,
+              transactionHistory: [webhookData]
+            }
+          },
+          {
+            session,
+            new: true
+          }
+        )
+
         // 1. Update order transactionStatus
         const orderHistory = new OrderHistoryDto(
           OrderStatus.PENDING,
@@ -241,28 +289,9 @@ export class PaymentService {
           {
             $set: {
               transactionStatus: TransactionStatus.ERROR,
-              'payment.transactionStatus': TransactionStatus.ERROR,
-              'payment.transaction': momoPaymentResponseDto,
-              'payment.transactionHistory': [momoPaymentResponseDto]
+              payment: payment
             },
             $push: { orderHistory }
-          },
-          {
-            session
-          }
-        )
-
-        // 2.  Update payment transactionStatus, transaction
-        await this.paymentRepository.findOneAndUpdate(
-          {
-            _id: order.payment._id
-          },
-          {
-            $set: {
-              transactionStatus: TransactionStatus.ERROR,
-              transaction: momoPaymentResponseDto,
-              transactionHistory: [momoPaymentResponseDto]
-            }
           },
           {
             session

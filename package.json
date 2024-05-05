@@ -1,7 +1,7 @@
 {
-  "name": "efurniture-api",
-  "version": "0.0.1",
-  "description": "efurniture API",
+  "name": "furnique-api",
+  "version": "1.0.0",
+  "description": "furnique API",
   "author": "Deco-Team",
   "license": "UNLICENSED",
   "scripts": {
@@ -29,6 +29,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.2.0",
+    "@payos/node": "^1.0.6",
     "@types/moment": "^2.13.0",
     "axios": "^1.6.5",
     "bcrypt": "^5.1.1",

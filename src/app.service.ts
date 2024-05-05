@@ -6,7 +6,7 @@ export class AppService {
   constructor(private readonly i18nService: I18nService) {}
 
   getHello(): string {
-    return 'Welcome to eFurniture!'
+    return 'Welcome to Furnique!'
   }
 
   getI18nText(): string {
