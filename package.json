@@ -16,7 +16,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org fpt-university-kz --project node-express ./dist && sentry-cli sourcemaps upload --org fpt-university-kz --project node-express ./dist"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.10.3",
@@ -30,6 +31,9 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.2.0",
     "@payos/node": "^1.0.6",
+    "@sentry/cli": "^2.31.2",
+    "@sentry/node": "^7.113.0",
+    "@sentry/profiling-node": "^7.113.0",
     "@types/moment": "^2.13.0",
     "axios": "^1.6.5",
     "bcrypt": "^5.1.1",

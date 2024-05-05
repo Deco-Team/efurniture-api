@@ -7,9 +7,37 @@ import { TransformInterceptor } from '@common/interceptors/transform.interceptor
 import { AppExceptionFilter } from '@common/exceptions/app-exception.filter'
 import { AppValidationPipe } from '@common/pipes/app-validate.pipe'
 import { TrimRequestBodyPipe } from '@common/pipes/trim-req-body.pipe'
+import {
+  init as sentryInit,
+  Integrations as SentryIntegrations,
+  Handlers as SentryHandlers,
+  autoDiscoverNodePerformanceMonitoringIntegrations
+} from '@sentry/node'
+import { nodeProfilingIntegration } from '@sentry/profiling-node'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  // Sentry
+  if (process.env.NODE_ENV === 'production') {
+    sentryInit({
+      dsn: process.env.SENTRY_DSN,
+      integrations: [
+        // Automatically instrument Node.js libraries and frameworks
+        ...autoDiscoverNodePerformanceMonitoringIntegrations(),
+        // enable HTTP calls tracing
+        new SentryIntegrations.Http({ tracing: true }),
+        nodeProfilingIntegration()
+      ],
+      // Performance Monitoring
+      tracesSampleRate: 1.0, //  Capture 100% of the transactions
+      // Set sampling rate for profiling - this is relative to tracesSampleRate
+      profilesSampleRate: 1.0
+    })
+  }
+  app.use(SentryHandlers.requestHandler())
+  app.use(SentryHandlers.tracingHandler())
+
   const logger = app.get(AppLogger)
   app.useLogger(logger)
   app.useGlobalInterceptors(new TransformInterceptor())
@@ -43,8 +71,8 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup('api-docs', app, document, {
       swaggerOptions: {
-        persistAuthorization: true,
-      },
+        persistAuthorization: true
+      }
     })
   }
 
