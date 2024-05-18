@@ -101,6 +101,10 @@ export class Product {
   images: string[]
 
   @ApiProperty()
+  @Prop({ type: String, required: false })
+  modelId?: string
+
+  @ApiProperty()
   @Prop({ type: Number, default: 0 })
   rate: number
 

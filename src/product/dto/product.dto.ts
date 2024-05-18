@@ -10,6 +10,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsOptional,
+  IsString,
   IsUrl,
   Max,
   MaxLength,
@@ -39,6 +40,11 @@ export class PublicProductDto {
     example: ['https://m.media-amazon.com/images/I/61KtSpR0SfL._AC_UL480_FMwebp_QL65_.jpg']
   })
   images: string[]
+
+  @ApiProperty({
+    example: '70c55cac-9d45-49e6-8094-0c74c749fd25'
+  })
+  modelId: string
 
   @ApiProperty({ type: Category, isArray: true })
   categories: Category[]
@@ -72,6 +78,13 @@ export class CreateProductDto {
   @IsUrl({}, { each: true })
   @IsNotEmpty()
   images: string[]
+
+  @ApiPropertyOptional({
+    example: '70c55cac-9d45-49e6-8094-0c74c749fd25'
+  })
+  @IsOptional()
+  @IsString()
+  modelId?: string
 
   @ApiProperty({
     example: 'ERYE'
@@ -116,6 +129,13 @@ export class UpdateProductDto {
   @IsNotEmpty()
   images: string[]
 
+  @ApiPropertyOptional({
+    example: '70c55cac-9d45-49e6-8094-0c74c749fd25'
+  })
+  @IsOptional()
+  @IsString()
+  modelId?: string
+
   @ApiProperty({
     example: 'ERYE'
   })
@@ -151,6 +171,11 @@ export class ProductDetailDto {
 
   @ApiProperty()
   images: string[]
+
+  @ApiPropertyOptional({
+    example: '70c55cac-9d45-49e6-8094-0c74c749fd25'
+  })
+  modelId?: string
 
   @ApiProperty()
   rate: number
