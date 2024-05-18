@@ -42,9 +42,9 @@ export class PublicProductDto {
   images: string[]
 
   @ApiProperty({
-    example: '70c55cac-9d45-49e6-8094-0c74c749fd25'
+    example: 'https://res.cloudinary.com/drta9lo35/image/upload/v1715929846/knmgqbnkllurf88xxd3b.glb'
   })
-  modelId: string
+  modelUrl: string
 
   @ApiProperty({ type: Category, isArray: true })
   categories: Category[]
@@ -80,11 +80,11 @@ export class CreateProductDto {
   images: string[]
 
   @ApiPropertyOptional({
-    example: '70c55cac-9d45-49e6-8094-0c74c749fd25'
+    example: 'https://res.cloudinary.com/drta9lo35/image/upload/v1715929846/knmgqbnkllurf88xxd3b.glb'
   })
   @IsOptional()
   @IsString()
-  modelId?: string
+  modelUrl?: string
 
   @ApiProperty({
     example: 'ERYE'
@@ -130,11 +130,11 @@ export class UpdateProductDto {
   images: string[]
 
   @ApiPropertyOptional({
-    example: '70c55cac-9d45-49e6-8094-0c74c749fd25'
+    example: 'https://res.cloudinary.com/drta9lo35/image/upload/v1715929846/knmgqbnkllurf88xxd3b.glb'
   })
   @IsOptional()
   @IsString()
-  modelId?: string
+  modelUrl?: string
 
   @ApiProperty({
     example: 'ERYE'
@@ -173,9 +173,9 @@ export class ProductDetailDto {
   images: string[]
 
   @ApiPropertyOptional({
-    example: '70c55cac-9d45-49e6-8094-0c74c749fd25'
+    example: 'https://res.cloudinary.com/drta9lo35/image/upload/v1715929846/knmgqbnkllurf88xxd3b.glb'
   })
-  modelId?: string
+  modelUrl?: string
 
   @ApiProperty()
   rate: number

@@ -59,7 +59,7 @@ export class ProductService {
           name: 1,
           rate: 1,
           images: 1,
-          modelId: 1,
+          modelUrl: 1,
           variants: 1,
           categories: 1,
           slug: 1

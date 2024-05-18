@@ -102,7 +102,7 @@ export class Product {
 
   @ApiProperty()
   @Prop({ type: String, required: false })
-  modelId?: string
+  modelUrl?: string
 
   @ApiProperty()
   @Prop({ type: Number, default: 0 })
@@ -145,8 +145,6 @@ ProductSchema.index(
     }
   }
 )
-ProductSchema.index(
-  { 'name': 'text' },
-)
+ProductSchema.index({ name: 'text' })
 ProductSchema.plugin(paginate)
 ProductSchema.plugin(slug)
