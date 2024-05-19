@@ -7,6 +7,7 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
   IsArray,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -45,6 +46,11 @@ export class PublicProductDto {
     example: 'https://res.cloudinary.com/drta9lo35/image/upload/v1715929846/knmgqbnkllurf88xxd3b.glb'
   })
   modelUrl: string
+
+  @ApiProperty({
+    example: 'floor | wall'
+  })
+  arPlacement: string
 
   @ApiProperty({ type: Category, isArray: true })
   categories: Category[]
@@ -85,6 +91,14 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   modelUrl?: string
+
+  @ApiPropertyOptional({
+    example: 'floor | wall'
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['floor', 'wall'])
+  arPlacement?: string
 
   @ApiProperty({
     example: 'ERYE'
@@ -136,6 +150,14 @@ export class UpdateProductDto {
   @IsString()
   modelUrl?: string
 
+  @ApiPropertyOptional({
+    example: 'floor | wall'
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['floor', 'wall'])
+  arPlacement?: string
+
   @ApiProperty({
     example: 'ERYE'
   })
@@ -176,6 +198,14 @@ export class ProductDetailDto {
     example: 'https://res.cloudinary.com/drta9lo35/image/upload/v1715929846/knmgqbnkllurf88xxd3b.glb'
   })
   modelUrl?: string
+
+  @ApiPropertyOptional({
+    example: 'floor | wall'
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['floor', 'wall'])
+  arPlacement?: string
 
   @ApiProperty()
   rate: number

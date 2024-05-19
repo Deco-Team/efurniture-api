@@ -104,6 +104,12 @@ export class Product {
   @Prop({ type: String, required: false })
   modelUrl?: string
 
+  @ApiProperty({
+    example: 'floor | wall'
+  })
+  @Prop({ type: String, required: false })
+  arPlacement?: string
+
   @ApiProperty()
   @Prop({ type: Number, default: 0 })
   rate: number
