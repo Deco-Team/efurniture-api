@@ -38,6 +38,7 @@
       "@consultant-booking/*": ["src/consultant-booking/*"],
       "@analytic/*": ["src/analytic/*"],
       "@payment/*": ["src/payment/*"],
+      "@ai-generation/*": ["src/ai-generation/*"],
       "@src/*": ["src/*"]
     },
 

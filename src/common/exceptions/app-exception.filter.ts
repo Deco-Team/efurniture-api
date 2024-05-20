@@ -43,11 +43,11 @@ export class AppExceptionFilter extends BaseExceptionFilter {
           },
           {
             name: 'data',
-            value: `${JSON.stringify(data).slice(0, 50)}...`
+            value: `${JSON.stringify(data).slice(0, 200)}...`
           },
           {
             name: 'stackTrace',
-            value: `${JSON.stringify(exception.stack).slice(0, 50)}...`
+            value: `${JSON.stringify(exception.stack).slice(0, 200)}...`
           }
         ]
       })

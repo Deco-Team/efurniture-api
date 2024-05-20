@@ -88,6 +88,9 @@ jobs:
           echo DISCORD_WEBHOOK_ID=${{ secrets.DISCORD_WEBHOOK_ID }} >> .env
           echo DISCORD_WEBHOOK_TOKEN=${{ secrets.DISCORD_WEBHOOK_TOKEN }} >> .env
 
+          echo TRIPO_3D_AI_ENDPOINT=${{ secrets.TRIPO_3D_AI_ENDPOINT }} >> .env
+          echo TRIPO_3D_AI_API_KEY=${{ vars.TRIPO_3D_AI_API_KEY }} >> .env
+
       - name: Deploy
         run: pm2 restart furnique-api
 
