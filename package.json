@@ -49,7 +49,7 @@
     "mongoose-slug-updater": "^3.3.0",
     "nest-commander": "^3.12.5",
     "nestjs-cls": "^3.6.0",
-    "nestjs-i18n": "^10.4.0",
+    "nestjs-i18n": "^10.4.5",
     "nodemailer": "^6.9.9",
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
