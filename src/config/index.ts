@@ -35,6 +35,10 @@ export default () => ({
     webhookId: process.env.DISCORD_WEBHOOK_ID,
     webhookToken: process.env.DISCORD_WEBHOOK_TOKEN,
   },
+  tripo3dAI: {
+    endpoint: process.env.TRIPO_3D_AI_ENDPOINT,
+    apiKey: process.env.TRIPO_3D_AI_API_KEY
+  },
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'accessSecret',
   JWT_ACCESS_EXPIRATION: process.env.JWT_ACCESS_EXPIRATION || 864000, // seconds
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'refreshSecret',

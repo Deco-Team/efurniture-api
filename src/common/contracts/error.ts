@@ -115,5 +115,10 @@ export const Errors: Record<string, ErrorResponse> = {
     error: 'VISIT_SHOWROOM_BOOKING_NOT_FOUND',
     message: 'Không tìm thấy lịch tham quan showroom. Vui lòng thử lại',
     httpStatus: HttpStatus.BAD_REQUEST
+  },
+  TRIPO_3D_AI_ERROR: {
+    error: 'TRIPO_3D_AI_ERROR',
+    message: 'Có chút lỗi xảy ra. Vui lòng thử lại sau giây lát bạn nhé.',
+    httpStatus: HttpStatus.INTERNAL_SERVER_ERROR
   }
 }

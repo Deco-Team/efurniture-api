@@ -24,6 +24,7 @@ import { ConsultantBookingModule } from '@consultant-booking/booking.module'
 import { TaskModule } from '@task/task.module'
 import { AnalyticModule } from '@analytic/analytic.module'
 import { PaymentModule } from '@payment/payment.module'
+import { AIGenerationModule } from '@ai-generation/ai-generation.module'
 
 @Module({
   imports: [
@@ -106,6 +107,10 @@ import { PaymentModule } from '@payment/payment.module'
       {
         path: 'consultant-bookings',
         module: ConsultantBookingModule
+      },
+      {
+        path: 'ai-generation',
+        module: AIGenerationModule
       }
     ]),
     CommonModule,
@@ -121,7 +126,8 @@ import { PaymentModule } from '@payment/payment.module'
     ConsultantBookingModule,
     TaskModule,
     AnalyticModule,
-    PaymentModule
+    PaymentModule,
+    AIGenerationModule
   ],
   controllers: [AppController],
   providers: [AppService]
