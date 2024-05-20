@@ -6,7 +6,7 @@ import { UserRole } from '@common/contracts/constant'
 import { RolesGuard } from '@auth/guards/roles.guard'
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard'
 import { AIGenerationTextToModelService } from '@ai-generation/services/text-to-model.service'
-import { GenerateTextToDraftModelDto, TextToModelTaskResponseDto } from '@ai-generation/dtos/text-to-model.dto'
+import { GenerateTextToDraftModelDto, TextToDraftModelResponseDto, TextToModelTaskResponseDto } from '@ai-generation/dtos/text-to-model.dto'
 
 @ApiTags('AIGeneration - TextToModel')
 @ApiBearerAuth()
@@ -19,7 +19,7 @@ export class AIGenerationTextToModelController {
   @ApiOperation({
     summary: 'Generate draft model from text'
   })
-  @ApiOkResponse({ type: TextToModelTaskResponseDto })
+  @ApiOkResponse({ type: TextToDraftModelResponseDto })
   @Post()
   generate(@Req() req, @Body() generateTextToDraftModelDto: GenerateTextToDraftModelDto) {
     generateTextToDraftModelDto.type = 'text_to_model'
