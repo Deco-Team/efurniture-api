@@ -38,7 +38,7 @@ export class AIGenerationTextToModelService {
         })
         .pipe(
           catchError((error: AxiosError) => {
-            this.logger.error(error.response.data)
+            this.logger.error(error?.response?.data)
             throw new AppException({ ...Errors.TRIPO_3D_AI_ERROR, data: error?.response?.data })
           })
         )
@@ -58,7 +58,7 @@ export class AIGenerationTextToModelService {
     const { data } = await firstValueFrom(
       this.httpService.get(`${this.config.endpoint}/v2/openapi/task/${taskId}`, { headers: this.headersRequest }).pipe(
         catchError((error: AxiosError) => {
-          this.logger.error(error.response.data)
+          this.logger.error(error?.response?.data)
           throw new AppException({ ...Errors.TRIPO_3D_AI_ERROR, data: error?.response?.data })
         })
       )
