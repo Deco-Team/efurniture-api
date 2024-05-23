@@ -120,5 +120,10 @@ export const Errors: Record<string, ErrorResponse> = {
     error: 'TRIPO_3D_AI_ERROR',
     message: 'Có chút lỗi xảy ra. Vui lòng thử lại sau giây lát bạn nhé.',
     httpStatus: HttpStatus.INTERNAL_SERVER_ERROR
+  },
+  EDEN_AI_ERROR: {
+    error: 'EDEN_AI_ERROR',
+    message: 'Có chút lỗi xảy ra. Vui lòng thử lại sau giây lát bạn nhé.',
+    httpStatus: HttpStatus.INTERNAL_SERVER_ERROR
   }
 }

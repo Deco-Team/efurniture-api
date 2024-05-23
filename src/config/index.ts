@@ -39,6 +39,10 @@ export default () => ({
     endpoint: process.env.TRIPO_3D_AI_ENDPOINT,
     apiKey: process.env.TRIPO_3D_AI_API_KEY
   },
+  edenAI: {
+    endpoint: process.env.EDEN_AI_ENDPOINT,
+    apiKey: process.env.EDEN_AI_API_KEY
+  },
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'accessSecret',
   JWT_ACCESS_EXPIRATION: process.env.JWT_ACCESS_EXPIRATION || 864000, // seconds
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'refreshSecret',

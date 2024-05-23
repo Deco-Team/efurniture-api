@@ -7,7 +7,7 @@ import { AxiosError } from 'axios'
 import { GenerateTextToDraftModelDto } from '@ai-generation/dtos/text-to-model.dto'
 import { AppException } from '@common/exceptions/app.exception'
 import { Errors } from '@common/contracts/error'
-import { AIGenerationType } from '@ai-generation/contracts/constant'
+import { AIGenerationPlatform, AIGenerationType } from '@ai-generation/contracts/constant'
 
 @Injectable()
 export class AIGenerationTextToModelService {
@@ -48,6 +48,8 @@ export class AIGenerationTextToModelService {
     await this.aiGenerationRepository.create({
       customerId,
       type: AIGenerationType.TEXT_TO_MODEL,
+      platform: AIGenerationPlatform.TRIPO_3D_AI,
+      cost: 20, // total 2000 credits
       taskId: data?.data?.task_id
     })
 

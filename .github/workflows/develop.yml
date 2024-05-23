@@ -91,6 +91,9 @@ jobs:
           echo TRIPO_3D_AI_ENDPOINT=${{ vars.TRIPO_3D_AI_ENDPOINT }} >> .env
           echo TRIPO_3D_AI_API_KEY=${{ secrets.TRIPO_3D_AI_API_KEY }} >> .env
 
+          echo EDEN_AI_ENDPOINT=${{ vars.EDEN_AI_ENDPOINT }} >> .env
+          echo EDEN_AI_API_KEY=${{ secrets.EDEN_AI_API_KEY }} >> .env
+
       - name: Deploy
         run: pm2 restart furnique-api
 
