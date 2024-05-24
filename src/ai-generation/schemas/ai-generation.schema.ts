@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose'
 import * as paginate from 'mongoose-paginate-v2'
 import { Transform } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
-import { AIGenerationType } from '../contracts/constant'
+import { AIGenerationPlatform, AIGenerationType } from '../contracts/constant'
 
 export type AIGenerationDocument = HydratedDocument<AIGeneration>
 
@@ -32,11 +32,21 @@ export class AIGeneration {
   @Prop({ enum: AIGenerationType, default: AIGenerationType.TEXT_TO_MODEL })
   type: AIGenerationType
 
+  @ApiProperty({ enum: AIGenerationPlatform })
+  @Prop({ enum: AIGenerationPlatform, default: AIGenerationPlatform.TRIPO_3D_AI })
+  platform: AIGenerationPlatform
+
+  @ApiProperty()
+  @Prop({ type: Number })
+  cost: number
+
   @ApiProperty()
   @Prop({ type: String })
-  taskId: string // used for TEXT_TO_MODEL
+  taskId?: string // used for TEXT_TO_MODEL
 
-  // more prop for other type
+  @ApiProperty()
+  @Prop({ type: String })
+  imageUrl?: string // used for TEXT_TO_IMAGE
 }
 
 export const AIGenerationSchema = SchemaFactory.createForClass(AIGeneration)
