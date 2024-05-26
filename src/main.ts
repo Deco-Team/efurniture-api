@@ -20,7 +20,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   // Sentry
-  if (process.env.NODE_ENV === 'development') { //'production'
+  if (process.env.NODE_ENV === 'production') {
     sentryInit({
       dsn: process.env.SENTRY_DSN,
       integrations: [
@@ -35,9 +35,9 @@ async function bootstrap() {
       // Set sampling rate for profiling - this is relative to tracesSampleRate
       profilesSampleRate: 1.0
     })
+    app.use(SentryHandlers.requestHandler())
+    app.use(SentryHandlers.tracingHandler())
   }
-  app.use(SentryHandlers.requestHandler())
-  app.use(SentryHandlers.tracingHandler())
 
   const logger = app.get(AppLogger)
   const discordService = app.get(DiscordService)
@@ -81,10 +81,10 @@ async function bootstrap() {
   // Example: process.env.CORS_VALID_ORIGINS=localhost,ngrok-free => parse to [ /localhost/, /ngrok-free/ ]
   const origins = process.env.CORS_VALID_ORIGINS?.split(',').map((origin) => new RegExp(origin)) || [
     /localhost/,
-    /ngrok-free/
+    /ngrok-free/,
+    /furnique.tech/
   ]
-  // app.enableCors({ origin: origins }); // use later
-  app.enableCors()
+  app.enableCors({ origin: origins });
 
   const port = process.env.PORT || 5000
   await app.listen(port)
