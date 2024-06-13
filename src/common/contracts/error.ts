@@ -125,5 +125,10 @@ export const Errors: Record<string, ErrorResponse> = {
     error: 'EDEN_AI_ERROR',
     message: 'Có chút lỗi xảy ra. Vui lòng thử lại sau giây lát bạn nhé.',
     httpStatus: HttpStatus.INTERNAL_SERVER_ERROR
+  },
+  NOT_ENOUGH_CREDITS_ERROR: {
+    error: 'NOT_ENOUGH_CREDITS_ERROR',
+    message: 'Số lượng credits còn lại không đủ. Vui lòng nạp thêm nhé.',
+    httpStatus: HttpStatus.BAD_REQUEST
   }
 }

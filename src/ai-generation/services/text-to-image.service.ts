@@ -6,8 +6,10 @@ import { catchError, firstValueFrom } from 'rxjs'
 import { AxiosError } from 'axios'
 import { AppException } from '@common/exceptions/app.exception'
 import { Errors } from '@common/contracts/error'
-import { AIGenerationPlatform, AIGenerationType } from '@ai-generation/contracts/constant'
+import { AIGenerationPlatform, AIGenerationPricing, AIGenerationType } from '@ai-generation/contracts/constant'
 import { GenerateTextToImageDto } from '@ai-generation/dtos/text-to-image.dto'
+import { CustomerRepository } from '@customer/repositories/customer.repository'
+import { Status } from '@common/contracts/constant'
 
 @Injectable()
 export class AIGenerationTextToImageService {
@@ -17,7 +19,8 @@ export class AIGenerationTextToImageService {
   constructor(
     private readonly aiGenerationRepository: AIGenerationRepository,
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly customerRepository: CustomerRepository
   ) {
     this.config = this.configService.get('edenAI')
     this.headersRequest = {
@@ -29,7 +32,16 @@ export class AIGenerationTextToImageService {
   async generateTextToImage(generateTextToImageDto: GenerateTextToImageDto) {
     const { customerId } = generateTextToImageDto
 
-    // TODO: Check limit AI generation here
+    // Check limit AI generation
+    const { credits } = await this.customerRepository.findOne({
+      conditions: {
+        _id: customerId,
+        status: Status.ACTIVE
+      }
+    })
+    if (credits < AIGenerationPricing.TEXT_TO_IMAGE) {
+      throw new AppException(Errors.NOT_ENOUGH_CREDITS_ERROR)
+    }
 
     const { data } = await firstValueFrom(
       this.httpService
@@ -47,14 +59,21 @@ export class AIGenerationTextToImageService {
     if (result?.status !== 'success') throw new AppException({ ...Errors.EDEN_AI_ERROR, data })
 
     const imageUrl = result?.items[0]?.image_resource_url
-    await this.aiGenerationRepository.create({
-      customerId,
-      type: AIGenerationType.TEXT_TO_IMAGE,
-      platform: AIGenerationPlatform.EDEN_AI,
-      cost: result?.cost ?? 0.01, // total 1 credits
-      imageUrl
-    })
-
+    await Promise.all([
+      this.aiGenerationRepository.create({
+        customerId,
+        type: AIGenerationType.TEXT_TO_IMAGE,
+        platform: AIGenerationPlatform.EDEN_AI,
+        cost: result?.cost ?? 0.01, // total 1 credits
+        imageUrl
+      }),
+      this.customerRepository.findOneAndUpdate(
+        { _id: customerId },
+        {
+          $inc: { credits: -AIGenerationPricing.TEXT_TO_IMAGE }
+        }
+      )
+    ])
     return { imageUrl }
   }
 }

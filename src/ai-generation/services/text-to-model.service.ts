@@ -7,7 +7,9 @@ import { AxiosError } from 'axios'
 import { GenerateTextToDraftModelDto } from '@ai-generation/dtos/text-to-model.dto'
 import { AppException } from '@common/exceptions/app.exception'
 import { Errors } from '@common/contracts/error'
-import { AIGenerationPlatform, AIGenerationType } from '@ai-generation/contracts/constant'
+import { AIGenerationPlatform, AIGenerationPricing, AIGenerationType } from '@ai-generation/contracts/constant'
+import { CustomerRepository } from '@customer/repositories/customer.repository'
+import { Status } from '@common/contracts/constant'
 
 @Injectable()
 export class AIGenerationTextToModelService {
@@ -18,6 +20,7 @@ export class AIGenerationTextToModelService {
     private readonly aiGenerationRepository: AIGenerationRepository,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly customerRepository: CustomerRepository
   ) {
     this.config = this.configService.get('tripo3dAI')
     this.headersRequest = {
@@ -27,9 +30,18 @@ export class AIGenerationTextToModelService {
   }
 
   async generateTextToDraftModel(generateTextToDraftModelDto: GenerateTextToDraftModelDto) {
-    const {customerId} = generateTextToDraftModelDto
+    const { customerId } = generateTextToDraftModelDto
 
-    // TODO: Check limit AI generation here
+    // Check limit AI generation
+    const { credits } = await this.customerRepository.findOne({
+      conditions: {
+        _id: customerId,
+        status: Status.ACTIVE
+      }
+    })
+    if (credits < AIGenerationPricing.TEXT_TO_MODEL) {
+      throw new AppException(Errors.NOT_ENOUGH_CREDITS_ERROR)
+    }
 
     const { data } = await firstValueFrom(
       this.httpService
@@ -45,13 +57,21 @@ export class AIGenerationTextToModelService {
     )
     if (data.code !== 0) throw new AppException({ ...Errors.TRIPO_3D_AI_ERROR, data })
 
-    await this.aiGenerationRepository.create({
-      customerId,
-      type: AIGenerationType.TEXT_TO_MODEL,
-      platform: AIGenerationPlatform.TRIPO_3D_AI,
-      cost: 20, // total 2000 credits
-      taskId: data?.data?.task_id
-    })
+    await Promise.all([
+      this.aiGenerationRepository.create({
+        customerId,
+        type: AIGenerationType.TEXT_TO_MODEL,
+        platform: AIGenerationPlatform.TRIPO_3D_AI,
+        cost: 20, // total 2000 credits
+        taskId: data?.data?.task_id
+      }),
+      this.customerRepository.findOneAndUpdate(
+        { _id: customerId },
+        {
+          $inc: { credits: -AIGenerationPricing.TEXT_TO_MODEL }
+        }
+      )
+    ])
 
     return data?.data
   }
