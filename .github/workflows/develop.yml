@@ -45,6 +45,7 @@ jobs:
       - name: Update sentry sourcemaps
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        continue-on-error: true
         run: npm run sentry:sourcemaps
       - name: 'Create env file'
         run: |
