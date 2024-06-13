@@ -44,7 +44,8 @@ export class PaymentController {
     if (!result) return false
 
     //2. Process webhook
-    return this.paymentService.processWebhook(PaymentMethod.MOMO, momoPaymentResponseDto)
+    this.paymentService.setStrategy(PaymentMethod.MOMO)
+    return this.paymentService.processWebhook(momoPaymentResponseDto)
   }
 
   @ApiOperation({
@@ -63,7 +64,8 @@ export class PaymentController {
     if (!result) return false
 
     //2. Process webhook
-    return this.paymentService.processWebhook(PaymentMethod.PAY_OS, webhookData)
+    this.paymentService.setStrategy(PaymentMethod.PAY_OS)
+    return this.paymentService.processWebhook(webhookData)
   }
 
   // @ApiOperation({

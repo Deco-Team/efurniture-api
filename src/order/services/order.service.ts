@@ -12,7 +12,7 @@ import { CartService } from '@cart/services/cart.service'
 import { InjectConnection } from '@nestjs/mongoose'
 import { ProductRepository } from '@product/repositories/product.repository'
 import { PaymentRepository } from '@payment/repositories/payment.repository'
-import { PaymentMethod } from '@payment/contracts/constant'
+import { PaymentMethod, PaymentType } from '@payment/contracts/constant'
 import { PaymentService } from '@payment/services/payment.service'
 import { CreateMomoPaymentResponse, QueryMomoPaymentDto } from '@payment/dto/momo-payment.dto'
 import { ConfigService } from '@nestjs/config'
@@ -174,11 +174,13 @@ export class OrderService {
       // 5. Create payment
       const payment = await this.paymentRepository.create(
         {
+          customerId: createOrderDto.customer?._id,
           transactionStatus: TransactionStatus.DRAFT,
           transaction: paymentResponseData,
           transactionHistory: [paymentResponseData],
           paymentMethod: createOrderDto.paymentMethod,
-          amount: totalAmount
+          amount: totalAmount,
+          paymentType: PaymentType.ORDER
         },
         {
           session

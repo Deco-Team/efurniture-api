@@ -8,6 +8,8 @@ import { AIGenerationTextToModelService } from './services/text-to-model.service
 import { AIGenerationRepository } from './repositories/ai-generation.repository'
 import { AIGenerationTextToImageController } from './controllers/text-to-image.controller'
 import { AIGenerationTextToImageService } from './services/text-to-image.service'
+import { AIGenerationPricingService } from './services/pricing.service'
+import { AIGenerationPricingController } from './controllers/pricing.controller'
 
 @Global()
 @Module({
@@ -16,8 +18,18 @@ import { AIGenerationTextToImageService } from './services/text-to-image.service
     HttpModule,
     CustomerModule
   ],
-  controllers: [AIGenerationTextToModelController, AIGenerationTextToImageController],
-  providers: [AIGenerationTextToModelService, AIGenerationTextToImageService, AIGenerationRepository],
-  exports: [AIGenerationTextToModelService, AIGenerationTextToImageService, AIGenerationRepository]
+  controllers: [AIGenerationTextToModelController, AIGenerationTextToImageController, AIGenerationPricingController],
+  providers: [
+    AIGenerationTextToModelService,
+    AIGenerationTextToImageService,
+    AIGenerationPricingService,
+    AIGenerationRepository
+  ],
+  exports: [
+    AIGenerationTextToModelService,
+    AIGenerationTextToImageService,
+    AIGenerationPricingService,
+    AIGenerationRepository
+  ]
 })
 export class AIGenerationModule {}

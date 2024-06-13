@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose'
 import * as paginate from 'mongoose-paginate-v2'
 import { Transform } from 'class-transformer'
 import { TransactionStatus } from '@common/contracts/constant'
-import { PaymentMethod } from '@payment/contracts/constant'
+import { PaymentMethod, PaymentType } from '@payment/contracts/constant'
 
 export type PaymentDocument = HydratedDocument<Payment>
 
@@ -23,6 +23,9 @@ export class Payment {
   @Transform(({ value }) => value?.toString())
   _id: string
 
+  @Prop({ type: String })
+  customerId: string
+
   @Prop({ enum: TransactionStatus, default: TransactionStatus.DRAFT })
   transactionStatus: TransactionStatus
 
@@ -37,6 +40,12 @@ export class Payment {
     default: PaymentMethod.MOMO
   })
   paymentMethod: PaymentMethod
+
+  @Prop({
+    enum: PaymentType,
+    default: PaymentType.ORDER
+  })
+  paymentType: PaymentType
 
   @Prop({ type: Number, required: true })
   amount: number

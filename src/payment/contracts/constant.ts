@@ -4,6 +4,11 @@ export enum PaymentMethod {
   ZALO_PAY = 'ZALO_PAY'
 }
 
+export enum PaymentType {
+  ORDER = 'ORDER',
+  AI = 'AI'
+}
+
 export enum MomoResultCode {
   SUCCESS = 0,
   AUTHORIZED = 9000,
