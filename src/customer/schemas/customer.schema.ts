@@ -4,6 +4,7 @@ import * as paginate from 'mongoose-paginate-v2'
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import { Gender, Status } from '@common/contracts/constant'
+import { DEFAULT_CREDITS } from '@ai-generation/contracts/constant'
 
 export type CustomerDocument = HydratedDocument<Customer>
 
@@ -75,6 +76,10 @@ export class Customer {
   @ApiProperty()
   @Prop({ type: String })
   googleUserId: string
+
+  @ApiProperty()
+  @Prop({ type: Number, min: 0, default: DEFAULT_CREDITS })
+  credits: number
 
   @Prop({
     enum: Status,

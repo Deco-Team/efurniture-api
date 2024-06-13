@@ -27,3 +27,10 @@ export enum AIGenerationTaskProgress {
   RUNNING = 'RUNNING',
   SUCCESS = 100
 }
+
+export const DEFAULT_CREDITS = 50;
+
+export enum AIGenerationPricing {
+  TEXT_TO_MODEL = 15,
+  TEXT_TO_IMAGE = 10
+}
