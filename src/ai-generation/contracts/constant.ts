@@ -34,3 +34,18 @@ export enum AIGenerationPricing {
   TEXT_TO_MODEL = 15,
   TEXT_TO_IMAGE = 10
 }
+
+export enum AIPricingPlan {
+  PERSONAL = 'PERSONAL',
+  PREMIUM = 'PREMIUM'
+}
+
+export const AIPricingPlanCost =  {
+  [AIPricingPlan.PERSONAL] : 2000, // 199000,
+  [AIPricingPlan.PREMIUM] : 499000
+}
+
+export const AIPricingPlanCredits =  {
+  [AIPricingPlan.PERSONAL] : 250,
+  [AIPricingPlan.PREMIUM] : 600
+}

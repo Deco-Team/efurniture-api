@@ -11,6 +11,7 @@ import { OrderModule } from '@order/order.module'
 import { CartModule } from '@cart/cart.module'
 import { ProductModule } from '@product/product.module'
 import { PayOSPaymentStrategy } from '@payment/strategies/payos.strategy'
+import { CustomerModule } from '@customer/customer.module'
 
 @Global()
 @Module({
@@ -19,7 +20,8 @@ import { PayOSPaymentStrategy } from '@payment/strategies/payos.strategy'
     HttpModule,
     OrderModule,
     CartModule,
-    ProductModule
+    ProductModule,
+    CustomerModule
   ],
   controllers: [PaymentController],
   providers: [PaymentService, PaymentRepository, ZaloPayPaymentStrategy, MomoPaymentStrategy, PayOSPaymentStrategy],
