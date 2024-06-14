@@ -22,7 +22,7 @@ export class PaymentService {
     private readonly paymentRepository: PaymentRepository,
     private readonly momoPaymentStrategy: MomoPaymentStrategy,
     private readonly zaloPayPaymentStrategy: ZaloPayPaymentStrategy,
-    private readonly payOSPaymentStrategy: PayOSPaymentStrategy
+    readonly payOSPaymentStrategy: PayOSPaymentStrategy
   ) {}
 
   public setStrategy(paymentMethod: PaymentMethod) {

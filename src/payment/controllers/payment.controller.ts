@@ -56,8 +56,8 @@ export class PaymentController {
     console.log('Handling PAYOS webhook', JSON.stringify(webhookData))
     this.paymentService.setStrategy(PaymentMethod.PAY_OS)
 
-    // // just skip for confirmWebhook
-    // if (webhookData.data.orderCode == 123) return true
+    // just skip for confirmWebhook
+    if (webhookData.data.orderCode == 123) return true
 
     //1. Validate signature with other data
     const result = this.paymentService.verifyPaymentWebhookData(webhookData)
@@ -68,13 +68,13 @@ export class PaymentController {
     return this.paymentService.processWebhook(webhookData)
   }
 
-  // @ApiOperation({
-  //   summary: 'Confirm  Webhook URL for PAYOS'
-  // })
-  // @Post('webhook/payos-confirm')
-  // async verifyWebhook() {
-  //   console.log('Handling Confirm  Webhook URL for PAYOS')
+  @ApiOperation({
+    summary: 'Confirm  Webhook URL for PAYOS'
+  })
+  @Post('webhook/payos-confirm')
+  async verifyWebhook() {
+    console.log('Handling Confirm  Webhook URL for PAYOS')
 
-  //   await this.paymentService.payOSPaymentStrategy.verifyWebhookUrl()
-  // }
+    await this.paymentService.payOSPaymentStrategy.verifyWebhookUrl()
+  }
 }
