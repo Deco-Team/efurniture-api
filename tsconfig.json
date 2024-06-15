@@ -39,6 +39,7 @@
       "@analytic/*": ["src/analytic/*"],
       "@payment/*": ["src/payment/*"],
       "@ai-generation/*": ["src/ai-generation/*"],
+      "@review/*": ["src/review/*"],
       "@src/*": ["src/*"]
     },
 
