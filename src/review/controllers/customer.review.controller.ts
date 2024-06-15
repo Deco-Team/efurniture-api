@@ -11,9 +11,6 @@ import { Pagination, PaginationParams } from '@common/decorators/pagination.deco
 import { CreateReviewDto, FilterReviewDto, ReviewResponseDto } from '@review/dtos/review.dto'
 
 @ApiTags('Review - Customer')
-@ApiBearerAuth()
-@Roles(UserRole.CUSTOMER)
-@UseGuards(JwtAuthGuard.ACCESS_TOKEN, RolesGuard)
 @Controller('customer')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
@@ -22,6 +19,9 @@ export class ReviewController {
     summary: 'Customer can review product after order completed'
   })
   @ApiOkResponse({ type: SuccessDataResponse })
+  @ApiBearerAuth()
+  @Roles(UserRole.CUSTOMER)
+  @UseGuards(JwtAuthGuard.ACCESS_TOKEN, RolesGuard)
   @Post()
   createReview(@Req() req, @Body() createReviewDto: CreateReviewDto) {
     createReviewDto.customerId = _.get(req, 'user._id')
