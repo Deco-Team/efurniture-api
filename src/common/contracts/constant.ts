@@ -92,3 +92,9 @@ export enum AnalyticPeriod {
   MONTH = 'MONTH',
   YEAR = 'YEAR',
 }
+
+export enum ReviewStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DELETED = 'DELETED'
+}

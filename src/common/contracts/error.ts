@@ -130,5 +130,10 @@ export const Errors: Record<string, ErrorResponse> = {
     error: 'NOT_ENOUGH_CREDITS_ERROR',
     message: 'Số lượng credits còn lại không đủ. Vui lòng nạp thêm nhé.',
     httpStatus: HttpStatus.BAD_REQUEST
-  }
+  },
+  REVIEW_ALREADY_EXIST: {
+    error: 'REVIEW_ALREADY_EXIST',
+    message: 'Bạn đã review sản phẩm này.',
+    httpStatus: HttpStatus.BAD_REQUEST
+  },
 }

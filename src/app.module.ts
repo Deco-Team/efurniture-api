@@ -25,6 +25,7 @@ import { TaskModule } from '@task/task.module'
 import { AnalyticModule } from '@analytic/analytic.module'
 import { PaymentModule } from '@payment/payment.module'
 import { AIGenerationModule } from '@ai-generation/ai-generation.module'
+import { ReviewModule } from '@review/review.module'
 
 @Module({
   imports: [
@@ -111,6 +112,10 @@ import { AIGenerationModule } from '@ai-generation/ai-generation.module'
       {
         path: 'ai-generation',
         module: AIGenerationModule
+      },
+      {
+        path: 'reviews',
+        module: ReviewModule
       }
     ]),
     CommonModule,
@@ -127,7 +132,8 @@ import { AIGenerationModule } from '@ai-generation/ai-generation.module'
     TaskModule,
     AnalyticModule,
     PaymentModule,
-    AIGenerationModule
+    AIGenerationModule,
+    ReviewModule
   ],
   controllers: [AppController],
   providers: [AppService]
