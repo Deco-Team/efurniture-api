@@ -3,6 +3,7 @@ import { CartService } from '@cart/services/cart.service'
 import { OrderStatus, TransactionStatus, UserRole } from '@common/contracts/constant'
 import { Errors } from '@common/contracts/error'
 import { AppException } from '@common/exceptions/app.exception'
+import { DiscordService } from '@common/services/discord.service'
 import { CustomerRepository } from '@customer/repositories/customer.repository'
 import { MailerService } from '@nestjs-modules/mailer'
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
@@ -39,7 +40,8 @@ export class PayOSPaymentStrategy implements IPaymentStrategy, OnModuleInit {
     private readonly productRepository: ProductRepository,
     private readonly paymentRepository: PaymentRepository,
     private readonly customerRepository: CustomerRepository,
-    private readonly mailerService: MailerService
+    private readonly mailerService: MailerService,
+    private readonly discordService: DiscordService
   ) {
     this.config = this.configService.get('payment.payos')
     this.payOS = new PayOS(this.config.clientId, this.config.apiKey, this.config.checksumKey)
@@ -264,6 +266,30 @@ export class PayOSPaymentStrategy implements IPaymentStrategy, OnModuleInit {
         }
       })
       // 10. Send notification to staff
+
+      // 4. Send notification to staff => Discord Bot
+      try {
+        this.discordService.sendMessage({
+          fields: [
+            {
+              name: 'PayOSPaymentStrategy',
+              value: 'processWebhookOrder'
+            },
+            {
+              name: 'Payment For Order',
+              value: 'SUCCESS'
+            },
+            {
+              name: 'orderId',
+              value: `${orderId}`
+            },
+            {
+              name: 'Total Amount',
+              value: `${order.totalAmount}`
+            }
+          ]
+        })
+      } catch (err) {}
     } else {
       // Payment failed
       this.logger.log('processWebhook: payment FAILED')
@@ -355,7 +381,29 @@ export class PayOSPaymentStrategy implements IPaymentStrategy, OnModuleInit {
       )
 
       // 3. Send email/notification to customer
-      // 4. Send notification to staff
+      // 4. Send notification to staff => Discord Bot
+      try {
+        this.discordService.sendMessage({
+          fields: [
+            {
+              name: 'PayOSPaymentStrategy',
+              value: 'processWebhookAI'
+            },
+            {
+              name: 'Payment For AI',
+              value: 'SUCCESS'
+            },
+            {
+              name: 'orderId',
+              value: `${orderId}`
+            },
+            {
+              name: 'credits',
+              value: `${credits}`
+            }
+          ]
+        })
+      } catch (err) {}
     } else {
       // Payment failed
       this.logger.log('processWebhook: payment FAILED')

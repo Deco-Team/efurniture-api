@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common'
+import { Logger, Module, OnModuleInit } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { Customer, CustomerSchema } from '@customer/schemas/customer.schema'
 import { CustomerRepository } from '@customer/repositories/customer.repository'
@@ -13,10 +13,11 @@ import { DEFAULT_CREDITS } from '@ai-generation/contracts/constant'
   exports: [CustomerService, CustomerRepository]
 })
 export class CustomerModule implements OnModuleInit {
+  private readonly logger = new Logger(CustomerModule.name) 
   constructor(private readonly customerRepository: CustomerRepository) {}
 
   async onModuleInit() {
-    console.log(`CustomerModule.OnModuleInit: Set default credits for customers`)
+    this.logger.log(`CustomerModule.OnModuleInit: Set default credits for customers`)
     await this.customerRepository.updateMany(
       { credits: { $exists: false } },
       {
