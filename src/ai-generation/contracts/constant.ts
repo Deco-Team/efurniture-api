@@ -28,7 +28,7 @@ export enum AIGenerationTaskProgress {
   SUCCESS = 100
 }
 
-export const DEFAULT_CREDITS = 50;
+export const DEFAULT_CREDITS = 30;
 
 export enum AIGenerationPricing {
   TEXT_TO_MODEL = 15,
@@ -41,11 +41,11 @@ export enum AIPricingPlan {
 }
 
 export const AIPricingPlanCost =  {
-  [AIPricingPlan.PERSONAL] : 2000, // 199000,
-  [AIPricingPlan.PREMIUM] : 499000
+  [AIPricingPlan.PERSONAL] : 2000, // 49000,
+  [AIPricingPlan.PREMIUM] : 119000
 }
 
 export const AIPricingPlanCredits =  {
-  [AIPricingPlan.PERSONAL] : 250,
-  [AIPricingPlan.PREMIUM] : 600
+  [AIPricingPlan.PERSONAL] : 60,
+  [AIPricingPlan.PREMIUM] : 150
 }
