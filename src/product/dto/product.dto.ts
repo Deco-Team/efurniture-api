@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { Product, Variant } from '@product/schemas/product.schema'
+import { Product, RatingCounting, Variant } from '@product/schemas/product.schema'
 import { Category } from '@src/category/schemas/category.schema'
 import { DataResponse, PaginateResponse } from '@src/common/contracts/openapi-builder'
 import { Transform, Type } from 'class-transformer'
@@ -218,6 +218,9 @@ export class ProductDetailDto {
 
   @ApiProperty({ type: Category, isArray: true })
   categories: Category[]
+  
+  @ApiProperty({ type: RatingCounting })
+  ratingCount: RatingCounting
 }
 
 export class FilterProductDto {

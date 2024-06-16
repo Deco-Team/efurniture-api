@@ -64,6 +64,33 @@ export class Variant {
   keyValue: Map<string, string>
 }
 
+export class RatingCounting {
+  @ApiProperty({
+    example: 5
+  })
+  1: number
+
+  @ApiProperty({
+    example: 5
+  })
+  2: number
+
+  @ApiProperty({
+    example: 5
+  })
+  3: number
+
+  @ApiProperty({
+    example: 5
+  })
+  4: number
+
+  @ApiProperty({
+    example: 5
+  })
+  5: number
+}
+
 @Schema({
   collection: 'products',
   timestamps: true,
@@ -111,10 +138,6 @@ export class Product {
   arPlacement?: string
 
   @ApiProperty()
-  @Prop({ type: Number, default: 0 })
-  rate: number
-
-  @ApiProperty()
   @Prop({ type: String })
   brand: string
 
@@ -136,6 +159,23 @@ export class Product {
     default: ProductStatus.ACTIVE
   })
   status: ProductStatus
+
+  @ApiProperty()
+  @Prop({ type: Number, default: 0 })
+  rate: number
+
+  @ApiProperty()
+  @Prop({
+    type: RatingCounting,
+    default: {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0
+    }
+  })
+  ratingCount: RatingCounting
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product)

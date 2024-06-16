@@ -9,6 +9,7 @@ import { ProductStatus } from '@common/contracts/constant'
 import { AppException } from '@common/exceptions/app.exception'
 import { Errors } from '@common/contracts/error'
 import { SuccessResponse } from '@common/contracts/dto'
+import { pick } from 'lodash'
 
 @Injectable()
 export class ReviewService {
@@ -81,22 +82,28 @@ export class ReviewService {
     })
 
     // 3. Update rating product
-    const avgRate = await this.reviewRepository.model.aggregate([
+    const rateSummary = await this.reviewRepository.model.aggregate([
       {
         $group: {
           _id: '$product',
-          avgRating: { $avg: '$rate' }
+          avgRating: { $avg: '$rate' },
+          1: { $sum: { $cond: [{ $eq: ['$rate', 1] }, 1, 0] } },
+          2: { $sum: { $cond: [{ $eq: ['$rate', 2] }, 1, 0] } },
+          3: { $sum: { $cond: [{ $eq: ['$rate', 3] }, 1, 0] } },
+          4: { $sum: { $cond: [{ $eq: ['$rate', 4] }, 1, 0] } },
+          5: { $sum: { $cond: [{ $eq: ['$rate', 5] }, 1, 0] } }
         }
       },
-      { $project: { roundedAvgRating: { $round: ['$avgRating', 1] } } }
+      { $project: { roundedAvgRating: { $round: ['$avgRating', 1] }, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 } }
     ])
 
-    this.logger.debug('ReviewService.createReview: ', avgRate[0]?.roundedAvgRating)
-    if (!!avgRate[0]?.roundedAvgRating) {
+    this.logger.debug('ReviewService.createReview: ', rateSummary[0])
+    if (!!rateSummary[0]?.roundedAvgRating) {
       await this.productRepository.findOneAndUpdate(
         { _id: createReviewDto.productId },
         {
-          rate: avgRate[0]?.roundedAvgRating
+          rate: rateSummary[0]?.roundedAvgRating,
+          ratingCount: pick(rateSummary[0], ['1', '2', '3', '4', '5'])
         }
       )
     }

@@ -18,7 +18,6 @@ export class DiscordService {
       await this.webhookClient.send({
         content,
         username: 'Furnique Bot',
-        //avatarURL: 'https://imgur.com/GHh8QIp.png',
         avatarURL:
           'https://nftcalendar.io/storage/uploads/2021/11/30/webp_net-gifmaker__1__1130202114500961a63a2147d4d.gif',
         embeds: [fields ? this.embed.setFields(fields) : this.embed]

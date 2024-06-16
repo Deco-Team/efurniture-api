@@ -63,7 +63,7 @@ export class ProductService {
           arPlacement: 1,
           variants: 1,
           categories: 1,
-          slug: 1
+          slug: 1,
         }
       }
     )
