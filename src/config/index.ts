@@ -36,12 +36,10 @@ export default () => ({
     webhookToken: process.env.DISCORD_WEBHOOK_TOKEN,
   },
   tripo3dAI: {
-    endpoint: process.env.TRIPO_3D_AI_ENDPOINT,
-    apiKey: process.env.TRIPO_3D_AI_API_KEY
+    endpoint: process.env.TRIPO_3D_AI_ENDPOINT
   },
   edenAI: {
-    endpoint: process.env.EDEN_AI_ENDPOINT,
-    apiKey: process.env.EDEN_AI_API_KEY
+    endpoint: process.env.EDEN_AI_ENDPOINT
   },
   NODE_ENV: process.env.NODE_ENV,
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'accessSecret',

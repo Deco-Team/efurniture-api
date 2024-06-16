@@ -40,6 +40,7 @@
       "@payment/*": ["src/payment/*"],
       "@ai-generation/*": ["src/ai-generation/*"],
       "@review/*": ["src/review/*"],
+      "@setting/*": ["src/setting/*"],
       "@src/*": ["src/*"]
     },
 

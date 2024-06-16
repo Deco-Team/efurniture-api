@@ -22,7 +22,7 @@ export class AIGenerationTextToImageController {
   @ApiOkResponse({ type: TextToImageResponseDto })
   @Post()
   generate(@Req() req, @Body() generateTextToImageDto: GenerateTextToImageDto) {
-    generateTextToImageDto.providers = ['openai/dall-e-2', 'openai/dall-e-3', 'openai', "amazon", 'amazon/titan-image-generator-v1_premium', 'amazon/titan-image-generator-v1_standard']
+    generateTextToImageDto.providers = ['openai/dall-e-2']
     generateTextToImageDto.resolution = "512x512"
     generateTextToImageDto.customerId = _.get(req, 'user._id')
     return this.aiGenerationTextToImageService.generateTextToImage(generateTextToImageDto)

@@ -26,6 +26,7 @@ import { AnalyticModule } from '@analytic/analytic.module'
 import { PaymentModule } from '@payment/payment.module'
 import { AIGenerationModule } from '@ai-generation/ai-generation.module'
 import { ReviewModule } from '@review/review.module'
+import { SettingModule } from '@setting/setting.module'
 
 @Module({
   imports: [
@@ -133,7 +134,8 @@ import { ReviewModule } from '@review/review.module'
     AnalyticModule,
     PaymentModule,
     AIGenerationModule,
-    ReviewModule
+    ReviewModule,
+    SettingModule
   ],
   controllers: [AppController],
   providers: [AppService]
