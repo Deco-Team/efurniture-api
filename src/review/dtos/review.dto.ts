@@ -12,6 +12,11 @@ export class CreateReviewDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @IsMongoId()
+  orderId: string
+
+  @ApiProperty()
+  @IsNotEmpty()
   @Max(5)
   @Min(1)
   @IsInt()

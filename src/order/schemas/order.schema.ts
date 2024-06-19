@@ -8,6 +8,7 @@ import { IsEmail, IsNotEmpty, IsPhoneNumber, MaxLength, ValidateNested } from 'c
 import { Product } from '@product/schemas/product.schema'
 import { CreateOrderItemDto } from '@order/dto/order.dto'
 import { Payment } from '@payment/schemas/payment.schema'
+import { Review } from '@review/schemas/review.schema'
 
 export class CustomerOrderDto {
   _id?: string
@@ -68,6 +69,9 @@ export class OrderItemDto extends CreateOrderItemDto {
 
   @ApiProperty()
   quantity: number
+
+  @ApiProperty()
+  review?: Review | string
 }
 
 export type OrderDocument = HydratedDocument<Order>
