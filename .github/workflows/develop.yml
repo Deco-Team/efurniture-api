@@ -1,0 +1,107 @@
+name: NestJS CI/CD
+
+on:
+  push:
+    branches: ['develop']
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
+
+jobs:
+  build:
+    runs-on: self-hosted
+    environment: develop
+    strategy:
+      matrix:
+        node-version: [20.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Update sentry sourcemaps
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        continue-on-error: true
+        run: npm run sentry:sourcemaps
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo NODE_ENV=${{ vars.NODE_ENV }} >> .env
+          echo PORT=${{ vars.PORT }} >> .env
+          echo MONGODB_CONNECTION_STRING=${{ secrets.MONGODB_CONNECTION_STRING }} >> .env
+          echo CORS_VALID_ORIGINS=${{ vars.CORS_VALID_ORIGINS }} >> .env
+
+          echo JWT_ACCESS_SECRET=${{ vars.JWT_ACCESS_SECRET }} >> .env
+          echo JWT_ACCESS_EXPIRATION=${{ vars.JWT_ACCESS_EXPIRATION }} >> .env
+          echo JWT_REFRESH_SECRET=${{ vars.JWT_REFRESH_SECRET }} >> .env
+          echo JWT_REFRESH_EXPIRATION=${{ vars.JWT_REFRESH_EXPIRATION }} >> .env
+
+          echo SMTP_USERNAME=${{ secrets.SMTP_USERNAME }} >> .env
+          echo SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} >> .env
+          echo SMTP_HOST=${{ vars.SMTP_HOST }} >> .env
+          echo SMTP_PORT=${{ vars.SMTP_PORT }} >> .env
+          echo SMTP_FROM_EMAIL=${{ vars.SMTP_FROM_EMAIL }} >> .env
+          echo SMTP_FROM_NAME=${{ vars.SMTP_FROM_NAME }} >> .env
+
+          echo WEB_URL=${{ vars.WEB_URL }} >> .env
+          echo SERVER_URL=${{ vars.SERVER_URL }} >> .env
+
+          echo MOMO_PARTNER_CODE=${{ secrets.MOMO_PARTNER_CODE }} >> .env
+          echo MOMO_ACCESS_KEY=${{ secrets.MOMO_ACCESS_KEY }} >> .env
+          echo MOMO_SECRET_KEY=${{ secrets.MOMO_SECRET_KEY }} >> .env
+          echo MOMO_ENDPOINT=${{ vars.MOMO_ENDPOINT }} >> .env
+
+          echo PAYOS_CLIENT_ID=${{ secrets.PAYOS_CLIENT_ID }} >> .env
+          echo PAYOS_API_KEY=${{ secrets.PAYOS_API_KEY }} >> .env
+          echo PAYOS_CHECKSUM_KEY=${{ secrets.PAYOS_CHECKSUM_KEY }} >> .env
+
+          echo ZALOPAY_APP_ID=${{ secrets.ZALOPAY_APP_ID }} >> .env
+          echo ZALOPAY_KEY1=${{ secrets.ZALOPAY_KEY1 }} >> .env
+          echo ZALOPAY_KEY2=${{ secrets.ZALOPAY_KEY2 }} >> .env
+          echo ZALOPAY_ENDPOINT=${{ vars.ZALOPAY_ENDPOINT }} >> .env
+
+          echo SENTRY_DSN=${{ secrets.SENTRY_DSN }} >> .env
+
+          echo DISCORD_WEBHOOK_ID=${{ secrets.DISCORD_WEBHOOK_ID }} >> .env
+          echo DISCORD_WEBHOOK_TOKEN=${{ secrets.DISCORD_WEBHOOK_TOKEN }} >> .env
+
+          echo TRIPO_3D_AI_ENDPOINT=${{ vars.TRIPO_3D_AI_ENDPOINT }} >> .env
+
+          echo EDEN_AI_ENDPOINT=${{ vars.EDEN_AI_ENDPOINT }} >> .env
+
+      - name: Deploy
+        run: pm2 restart furnique-api
+
+  snyk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}

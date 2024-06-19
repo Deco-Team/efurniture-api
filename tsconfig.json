@@ -17,8 +17,8 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
+
     "paths": {
-      "@src/*": ["src/*"],
       "@common/*": ["src/common/*"],
       "@media/*": ["src/media/*"],
       "@mail/*": ["src/mail/*"],
@@ -27,6 +27,28 @@
       "@seeds/*": ["src/seeds/*"],
       "@i18n/*": ["src/i18n/*"],
       "@booking/*": ["src/booking/*"],
-    }
+      "@product/*": ["src/product/*"],
+      "@cart/*": ["src/cart/*"],
+      "@staff/*": ["src/staff/*"],
+      "@category/*": ["src/category/*"],
+      "@order/*": ["src/order/*"],
+      "@task/*": ["src/task/*"],
+      "@provider/*": ["src/provider/*"],
+      "@visit-showroom-booking/*": ["src/visit-showroom-booking/*"],
+      "@consultant-booking/*": ["src/consultant-booking/*"],
+      "@analytic/*": ["src/analytic/*"],
+      "@payment/*": ["src/payment/*"],
+      "@ai-generation/*": ["src/ai-generation/*"],
+      "@review/*": ["src/review/*"],
+      "@setting/*": ["src/setting/*"],
+      "@src/*": ["src/*"]
+    },
+
+    "inlineSources": true,
+
+    // Set `sourceRoot` to  "/" to strip the build path prefix
+    // from generated source code references.
+    // This improves issue grouping in Sentry.
+    "sourceRoot": "/"
   }
 }

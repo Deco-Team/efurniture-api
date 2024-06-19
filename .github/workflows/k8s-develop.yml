@@ -1,0 +1,111 @@
+name: NestJS CI/CD on Kubernetes
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+    name: CI/CD on EKS
+    runs-on: ubuntu-latest
+    environment: develop
+    env:
+      ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+
+    steps:
+    - name: Cancel Previous Runs               
+      uses: styfle/cancel-workflow-action@0.4.1
+      with:                                    
+        access_token: ${{ github.token }} 
+
+    - name: Set short git commit SHA
+      id: commit
+      uses: prompt/actions-commit-hash@v2
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Make .env file
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_NODE_ENV: ${{ vars.NODE_ENV }}
+        envkey_PORT: ${{ vars.PORT }}
+        envkey_MONGODB_CONNECTION_STRING: ${{ secrets.MONGODB_CONNECTION_STRING }}
+        envkey_CORS_VALID_ORIGINS: ${{ vars.CORS_VALID_ORIGINS }}
+
+        envkey_JWT_ACCESS_SECRET: ${{ vars.JWT_ACCESS_SECRET }}
+        envkey_JWT_ACCESS_EXPIRATION: ${{ vars.JWT_ACCESS_EXPIRATION }}
+        envkey_JWT_REFRESH_SECRET: ${{ vars.JWT_REFRESH_SECRET }}
+        envkey_JWT_REFRESH_EXPIRATION: ${{ vars.JWT_REFRESH_EXPIRATION }}    
+
+        envkey_SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+        envkey_SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}    
+        envkey_SMTP_HOST: ${{ vars.SMTP_HOST }}
+        envkey_SMTP_PORT: ${{ vars.SMTP_PORT }}
+        envkey_SMTP_FROM_EMAIL: ${{ vars.SMTP_FROM_EMAIL }}
+        envkey_SMTP_FROM_NAME: ${{ vars.SMTP_FROM_NAME }}
+
+        envkey_WEB_URL: ${{ vars.WEB_URL }}
+        envkey_SERVER_URL: ${{ vars.SERVER_URL }}
+
+        envkey_MOMO_PARTNER_CODE: ${{ secrets.MOMO_PARTNER_CODE }}
+        envkey_MOMO_ACCESS_KEY: ${{ secrets.MOMO_ACCESS_KEY }}
+        envkey_MOMO_SECRET_KEY: ${{ secrets.MOMO_SECRET_KEY }}
+        envkey_MOMO_ENDPOINT: ${{ vars.MOMO_ENDPOINT }}  
+
+        envkey_ZALOPAY_APP_ID: ${{ secrets.ZALOPAY_APP_ID }}
+        envkey_ZALOPAY_KEY1: ${{ secrets.ZALOPAY_KEY1 }}
+        envkey_ZALOPAY_KEY2: ${{ secrets.ZALOPAY_KEY2 }}
+        envkey_ZALOPAY_ENDPOINT: ${{ vars.ZALOPAY_ENDPOINT }}  
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Set up Docker Buildx                             
+      id: buildx                                             
+      uses: docker/setup-buildx-action@master
+
+    - name: Docker cache layers                              
+      uses: actions/cache@v2                                 
+      with:                                                  
+        path: /tmp/.buildx-cache                             
+        key: ${{ runner.os }}-single-buildx-${{ github.sha }}
+        restore-keys: |                                      
+          ${{ runner.os }}-single-buildx  
+
+    - name: Build & Push Image                                                                                      
+      env:                                                                                                          
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ steps.commit.outputs.short }}
+
+      run: |
+        docker buildx create --use
+
+        docker buildx build \
+          --cache-from=type=local,src=/tmp/.buildx-cache \
+          --cache-to=type=local,dest=/tmp/.buildx-cache-new \
+          --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
+          --push \
+          .                                 
+
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ vars.AWS_REGION }}
+
+    - name: Deploy to EKS
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ steps.commit.outputs.short }}
+      run: |
+        sed -i.bak "s|DOCKER_IMAGE|${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}|g" k8s/deployment.yaml && \
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/ingress.yaml

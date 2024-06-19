@@ -1,0 +1,38 @@
+<pre style="font-family: Helvetica, sans-serif; font-size: 1.5em;">
+<h2>Thông báo hủy đơn hàng!</h2>
+Xin chào <%= customer.firstName %> <%= customer.lastName %>,
+
+Furnique xác nhận rằng đơn hàng của bạn đã được hủy thành công.
+Số tiền đã thanh toán sẽ được hoàn lại vào tài khoản của bạn trong thời gian sớm nhất.
+
+Mã Đơn Hàng: <b><%= orderId %></b>
+
+Chi tiết đơn hàng:
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background-color: #a9a3a3; color: #fff;">
+          <th style="border: 1px solid #ddd; padding: 8px; width: 200px;">#</th>
+          <th style="border: 1px solid #ddd; padding: 8px;">Sản Phẩm</th>
+          <th style="border: 1px solid #ddd; padding: 8px;">Số Lượng</th>
+          <th style="border: 1px solid #ddd; padding: 8px;">Giá</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% items.forEach(function(item) { %>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><img style="width: 200px; height: 200px;" src="<%= item.product.images[0] %>" alt="<%= item.product.name %>" /></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><%= item.product.name %></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><%= item.quantity %></td>
+            <td style="border: 1px solid #ddd; padding: 8px;">&#8363;<%= item.product.variant.price %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <p style="text-align: right; margin-top: 0;">Tổng tiền: <b>&#8363;<%= totalAmount %></b></p>
+  <div align="center" style="padding-top:10px">
+    <a href="https://www.furnique.tech/customer/orders/<%= _id %>" target="_blank" style="text-decoration: none;">
+        <img src="https://ci3.googleusercontent.com/meips/ADKq_NYVaPakFqAiVY0nV0ofSouvN9L1z5IPXEMnXGI7cDC2QzODNqWZbtxPiVtknKQTDcngkmkS0VgcnEczKmq2VcvjA7rxWbMeLU19p7LjY9ScARIX6-0xLQ=s0-d-e1-ft#https://img.alicdn.com/tfs/TB178CsJeH2gK0jSZFEXXcqMpXa-300-50.jpg" style="max-width:300px" border="0" class="CToWUd" data-bit="iit">
+    </a>
+  </div>
+</pre>
+<%- include('web-footer') -%>

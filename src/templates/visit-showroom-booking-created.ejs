@@ -1,0 +1,16 @@
+<pre style="font-family: Helvetica, sans-serif; font-size: 1.5em;">
+<h2>Xác nhận hẹn tham quan showroom</h2>
+Thân gửi <b><%= customer.firstName %> <%= customer.lastName %>,</b>
+
+Chúng tôi xác nhận rằng bạn đã đặt lịch hẹn tham quan showroom của chúng tôi.
+
+<b>Thông tin chi tiết:</b>
+  Tên: <%= customer.firstName %> <%= customer.lastName %>
+  Số điện thoại: <%= customer.phone %>
+  Thời gian: <%= bookingDate %>
+  Địa điểm: Lô E2a-7, Đường D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh
+  Ghi chú: <%= notes %>
+
+  Nếu bạn có bất kỳ câu hỏi hoặc cần thay đổi lịch hẹn, vui lòng liên hệ với chúng tôi qua thông tin dưới đây:
+</pre>
+<%- include('web-footer') -%>
