@@ -81,6 +81,11 @@ export const Errors: Record<string, ErrorResponse> = {
     message: 'Đơn hàng không hợp lệ.',
     httpStatus: HttpStatus.BAD_REQUEST
   },
+  ORDER_ITEM_NOT_FOUND: {
+    error: 'ORDER_ITEM_NOT_FOUND',
+    message: 'Sản phẩm không tồn tại trong đơn hàng.',
+    httpStatus: HttpStatus.BAD_REQUEST
+  },
   STAFF_NOT_FOUND: {
     error: 'STAFF_NOT_FOUND',
     message: 'Không tìm thấy nhân viên.',
@@ -133,7 +138,7 @@ export const Errors: Record<string, ErrorResponse> = {
   },
   REVIEW_ALREADY_EXIST: {
     error: 'REVIEW_ALREADY_EXIST',
-    message: 'Bạn đã review sản phẩm này.',
+    message: 'Bạn đã review sản phẩm trong đơn hàng này.',
     httpStatus: HttpStatus.BAD_REQUEST
   },
 }

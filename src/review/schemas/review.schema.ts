@@ -6,6 +6,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Customer } from '@customer/schemas/customer.schema'
 import { Product } from '@product/schemas/product.schema'
 import { ReviewStatus } from '@common/contracts/constant'
+import { Order } from '@order/schemas/order.schema'
 
 export type ReviewDocument = HydratedDocument<Review>
 
@@ -33,6 +34,9 @@ export class Review {
   @ApiProperty({ type: Product })
   @Prop({ type: Types.ObjectId, ref: Product.name })
   product: Product;
+
+  @Prop({ type: Types.ObjectId, ref: Order.name, select: false })
+  order: Types.ObjectId;
 
   @ApiProperty()
   @Prop({ type: Number })

@@ -7,6 +7,7 @@ import { ReviewController } from './controllers/customer.review.controller'
 import { ReviewService } from './services/review.service'
 import { ReviewRepository } from './repositories/review.repository'
 import { ProductModule } from '@product/product.module'
+import { OrderModule } from '@order/order.module'
 
 @Global()
 @Module({
@@ -14,7 +15,8 @@ import { ProductModule } from '@product/product.module'
     MongooseModule.forFeature([{ name: Review.name, schema: ReviewSchema }]),
     HttpModule,
     CustomerModule,
-    ProductModule
+    ProductModule,
+    OrderModule
   ],
   controllers: [ReviewController],
   providers: [ReviewService, ReviewRepository],

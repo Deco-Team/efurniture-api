@@ -18,6 +18,7 @@ import { CreateMomoPaymentResponse, QueryMomoPaymentDto } from '@payment/dto/mom
 import { ConfigService } from '@nestjs/config'
 import { MailerService } from '@nestjs-modules/mailer'
 import { CheckoutRequestType, CheckoutResponseDataType, PaymentLinkDataType } from '@payos/node/lib/type'
+import { Review } from '@review/schemas/review.schema'
 
 @Injectable()
 export class OrderService {
@@ -63,7 +64,13 @@ export class OrderService {
           $ne: OrderStatus.DELETED
         }
       },
-      projection: '+items'
+      projection: '+items',
+      populates: [
+        {
+          path: 'items.review',
+          model: Review.name
+        }
+      ]
     })
     if (!order) throw new AppException(Errors.ORDER_NOT_FOUND)
 
