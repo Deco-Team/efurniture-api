@@ -21,6 +21,11 @@ export const Errors: Record<string, ErrorResponse> = {
     message: 'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên lạc với admin.',
     httpStatus: HttpStatus.BAD_REQUEST
   },
+  WRONG_OTP: {
+    error: 'WRONG_OTP',
+    message: 'Mã OTP không đúng',
+    httpStatus: HttpStatus.BAD_REQUEST
+  },
   EMAIL_ALREADY_EXIST: {
     error: 'EMAIL_ALREADY_EXIST',
     message: 'Email đã được sử dụng',

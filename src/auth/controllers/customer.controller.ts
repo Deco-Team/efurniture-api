@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common'
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger'
-import { ErrorResponse, SuccessDataResponse } from '@common/contracts/dto'
-import { GoogleLoginReqDto, LoginReqDto } from '@auth/dto/login.dto'
+import { ErrorResponse, SuccessDataResponse, SuccessResponse } from '@common/contracts/dto'
+import { GoogleLoginReqDto, LoginReqDto, VerifyOtpReqDto } from '@auth/dto/login.dto'
 import { AuthService } from '@auth/services/auth.service'
 import { TokenResDto } from '@auth/dto/token.dto'
 import { UserSide } from '@common/contracts/constant'
@@ -27,6 +27,22 @@ export class AuthCustomerController {
   @ApiBadRequestResponse({ type: ErrorResponse })
   googleLogin(@Body() googleLoginReqDto: GoogleLoginReqDto): Promise<TokenResDto> {
     return this.authService.googleLogin(googleLoginReqDto)
+  }
+
+  @Post('login-otp')
+  @ApiBody({ type: LoginReqDto })
+  @ApiOkResponse({ type: DataResponse(SuccessResponse) })
+  @ApiBadRequestResponse({ type: ErrorResponse })
+  loginOtp(@Body() loginReqDto: LoginReqDto): Promise<SuccessResponse> {
+    return this.authService.loginOtp(loginReqDto, UserSide.CUSTOMER)
+  }
+
+  @Post('verify-otp')
+  @ApiBody({ type: VerifyOtpReqDto })
+  @ApiOkResponse({ type: DataResponse(TokenResDto) })
+  @ApiBadRequestResponse({ type: ErrorResponse })
+  verifyOtp(@Body() verifyOtpReqDto: VerifyOtpReqDto): Promise<TokenResDto> {
+    return this.authService.verifyOtp(verifyOtpReqDto, UserSide.CUSTOMER)
   }
 
   @Post('register')

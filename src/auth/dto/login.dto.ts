@@ -11,6 +11,16 @@ export class LoginReqDto {
     password: string;
 }
 
+export class VerifyOtpReqDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    email: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    otp: string;
+}
+
 export class GoogleLoginReqDto {
     @ApiProperty()
     @IsNotEmpty()

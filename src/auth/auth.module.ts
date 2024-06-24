@@ -9,6 +9,9 @@ import { ConfigModule } from '@nestjs/config'
 import { JwtRefreshStrategy } from '@auth/strategies/jwt-refresh.strategy'
 import { StaffModule } from '@staff/staff.module'
 import { AuthProviderController } from '@auth/controllers/provider.controller'
+import { OtpRepository } from './repositories/otp.repository'
+import { MongooseModule } from '@nestjs/mongoose'
+import { Otp, OtpSchema } from './schema/otp.schema'
 
 @Global()
 @Module({
@@ -17,10 +20,11 @@ import { AuthProviderController } from '@auth/controllers/provider.controller'
     CustomerModule,
     StaffModule,
     PassportModule,
-    JwtModule
+    JwtModule,
+    MongooseModule.forFeature([{ name: Otp.name, schema: OtpSchema }])
   ],
   controllers: [AuthCustomerController, AuthProviderController],
-  providers: [AuthService, JwtAccessStrategy, JwtRefreshStrategy],
+  providers: [AuthService, JwtAccessStrategy, JwtRefreshStrategy, OtpRepository],
   exports: [AuthService]
 })
 export class AuthModule {}

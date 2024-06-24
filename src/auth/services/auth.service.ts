@@ -1,6 +1,7 @@
+import { OtpRepository } from './../repositories/otp.repository'
 import { JwtService } from '@nestjs/jwt'
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common'
-import { GoogleLoginReqDto, LoginReqDto } from '@auth/dto/login.dto'
+import { GoogleLoginReqDto, LoginReqDto, VerifyOtpReqDto } from '@auth/dto/login.dto'
 import { CustomerRepository } from '@customer/repositories/customer.repository'
 import { Errors } from '@common/contracts/error'
 import { Customer } from '@customer/schemas/customer.schema'
@@ -15,14 +16,17 @@ import { StaffRepository } from '@staff/repositories/staff.repository'
 import { Staff } from '@staff/schemas/staff.schema'
 import { SuccessResponse } from '@common/contracts/dto'
 import { OAuth2Client } from 'google-auth-library'
+import { MailerService } from '@nestjs-modules/mailer'
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly customerRepository: CustomerRepository,
     private readonly staffRepository: StaffRepository,
+    private readonly otpRepository: OtpRepository,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly mailerService: MailerService
   ) {}
 
   public async login(loginReqDto: LoginReqDto, side: UserSide): Promise<TokenResDto> {
@@ -58,6 +62,108 @@ export class AuthService {
     const isPasswordMatch = await this.comparePassword(loginReqDto.password, user.password)
 
     if (!isPasswordMatch) throw new BadRequestException(Errors.WRONG_EMAIL_OR_PASSWORD.message)
+
+    const accessTokenPayload: AccessTokenPayload = { name: user.firstName, sub: user._id, role: userRole, providerId }
+
+    const refreshTokenPayload: RefreshTokenPayload = { sub: user._id, role: userRole }
+
+    const tokens = this.generateTokens(accessTokenPayload, refreshTokenPayload)
+
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken
+    }
+  }
+
+  public async loginOtp(loginReqDto: LoginReqDto, side: UserSide): Promise<SuccessResponse> {
+    let user: Customer | Staff
+    let userRole: UserRole
+    let providerId: string
+
+    if (side === UserSide.CUSTOMER) {
+      user = await this.customerRepository.findOne({
+        conditions: {
+          email: loginReqDto.email
+        }
+      })
+
+      userRole = UserRole.CUSTOMER
+    }
+
+    if (side === UserSide.PROVIDER) {
+      user = await this.staffRepository.findOne({
+        conditions: {
+          email: loginReqDto.email
+        }
+      })
+
+      userRole = user?.role
+      providerId = user?.providerId.toString()
+    }
+
+    if (!user) throw new BadRequestException(Errors.WRONG_EMAIL_OR_PASSWORD.message)
+
+    if (user.status === Status.INACTIVE) throw new BadRequestException(Errors.INACTIVE_ACCOUNT.message)
+
+    const isPasswordMatch = await this.comparePassword(loginReqDto.password, user.password)
+
+    if (!isPasswordMatch) throw new BadRequestException(Errors.WRONG_EMAIL_OR_PASSWORD.message)
+
+    const otp = Math.floor(1000 + Math.random() * 9000).toString()
+    this.otpRepository.create({ otp, customerId: user._id, expiredAt: new Date(Date.now() + 5 * 60000) })
+
+    // Send email contain OTP to customer
+    await this.mailerService.sendMail({
+      to: loginReqDto.email,
+      subject: `[Furnique] Mã OTP đăng nhập`,
+      template: 'login-otp',
+      context: {
+        otp
+      }
+    })
+
+    return new SuccessResponse(true)
+  }
+
+  public async verifyOtp(verifyOtpReqDto: VerifyOtpReqDto, side: UserSide): Promise<TokenResDto> {
+    let user: Customer | Staff
+    let userRole: UserRole
+    let providerId: string
+
+    if (side === UserSide.CUSTOMER) {
+      user = await this.customerRepository.findOne({
+        conditions: {
+          email: verifyOtpReqDto.email
+        }
+      })
+
+      userRole = UserRole.CUSTOMER
+    }
+
+    if (side === UserSide.PROVIDER) {
+      user = await this.staffRepository.findOne({
+        conditions: {
+          email: verifyOtpReqDto.email
+        }
+      })
+
+      userRole = user?.role
+      providerId = user?.providerId.toString()
+    }
+
+    if (!user) throw new BadRequestException(Errors.WRONG_EMAIL_OR_PASSWORD.message)
+
+    if (user.status === Status.INACTIVE) throw new BadRequestException(Errors.INACTIVE_ACCOUNT.message)
+
+    const otp = await this.otpRepository.findOne({
+      conditions: {
+        otp: verifyOtpReqDto.otp,
+        customerId: user._id,
+        expiredAt: { $gt: new Date() }
+      }
+    })
+
+    if (!otp) throw new BadRequestException(Errors.WRONG_OTP.message)
 
     const accessTokenPayload: AccessTokenPayload = { name: user.firstName, sub: user._id, role: userRole, providerId }
 
