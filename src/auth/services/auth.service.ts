@@ -87,7 +87,7 @@ export class AuthService {
 
     let user = await this.customerRepository.findOne({
       conditions: {
-        googleUserId: googleUserId
+        $or: [{ email: payload.email }, { googleUserId: googleUserId }]
       }
     })
 
