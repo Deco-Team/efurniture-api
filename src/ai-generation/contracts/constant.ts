@@ -41,7 +41,7 @@ export enum AIPricingPlan {
 }
 
 export const AIPricingPlanCost =  {
-  [AIPricingPlan.PERSONAL] : 2000, // 49000,
+  [AIPricingPlan.PERSONAL] : 49000,
   [AIPricingPlan.PREMIUM] : 119000
 }
 
