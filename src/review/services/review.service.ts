@@ -113,6 +113,11 @@ export class ReviewService {
       // 3. Update rating product
       const rateSummary = await this.reviewRepository.model.aggregate([
         {
+          $match: {
+            product: product._id.toString()
+          }
+        },
+        {
           $group: {
             _id: '$product',
             avgRating: { $avg: '$rate' },
