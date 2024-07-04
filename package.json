@@ -41,7 +41,7 @@
     "class-validator": "^0.14.1",
     "discord.js": "^14.15.1",
     "ejs": "^3.1.9",
-    "google-auth-library": "^9.5.0",
+    "google-auth-library": "^9.11.0",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
     "mongoose": "^8.1.0",
