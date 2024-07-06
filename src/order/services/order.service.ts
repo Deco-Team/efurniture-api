@@ -14,7 +14,7 @@ import { ProductRepository } from '@product/repositories/product.repository'
 import { PaymentRepository } from '@payment/repositories/payment.repository'
 import { PaymentMethod, PaymentType } from '@payment/contracts/constant'
 import { PaymentService } from '@payment/services/payment.service'
-import { CreateMomoPaymentResponse, QueryMomoPaymentDto } from '@payment/dto/momo-payment.dto'
+import { CreateMomoPaymentDto, CreateMomoPaymentResponse, QueryMomoPaymentDto } from '@payment/dto/momo-payment.dto'
 import { ConfigService } from '@nestjs/config'
 import { MailerService } from '@nestjs-modules/mailer'
 import { CheckoutRequestType, CheckoutResponseDataType, PaymentLinkDataType } from '@payos/node/lib/type'
@@ -140,26 +140,26 @@ export class OrderService {
       const MAX_VALUE = 9_007_199_254_740_991
       const MIM_VALUE = 1_000_000_000_000_000
       const orderCode = Math.floor(MIM_VALUE + Math.random() * (MAX_VALUE - MIM_VALUE))
-      createOrderDto['paymentMethod'] = PaymentMethod.PAY_OS
+      // createOrderDto['paymentMethod'] = PaymentMethod.PAY_OS
       switch (createOrderDto.paymentMethod) {
-        // case PaymentMethod.MOMO:
-        // this.paymentService.setStrategy(PaymentMethod.MOMO)
-        // const createMomoPaymentDto: CreateMomoPaymentDto = {
-        //   partnerName: 'FURNIQUE',
-        //   orderInfo: `Furnique - Thanh toán đơn hàng #${orderCode}`,
-        //   redirectUrl: `${this.configService.get('WEB_URL')}/customer/orders`,
-        //   ipnUrl: `${this.configService.get('SERVER_URL')}/payment/webhook/momo`,
-        //   requestType: 'payWithMethod',
-        //   amount: totalAmount,
-        //   orderId: orderCode.toString(),
-        //   requestId: orderCode.toString(),
-        //   extraData: '',
-        //   autoCapture: true,
-        //   lang: 'vi',
-        //   orderExpireTime: 15
-        // }
-        // paymentResponseData = checkoutData = await this.paymentService.createTransaction(createMomoPaymentDto)
-        // break
+        case PaymentMethod.MOMO:
+          this.paymentService.setStrategy(PaymentMethod.MOMO)
+          const createMomoPaymentDto: CreateMomoPaymentDto = {
+            partnerName: 'FURNIQUE',
+            orderInfo: `Furnique - Thanh toán đơn hàng #${orderCode}`,
+            redirectUrl: `${this.configService.get('WEB_URL')}/customer/orders`,
+            ipnUrl: `${this.configService.get('SERVER_URL')}/payment/webhook/momo`,
+            requestType: 'payWithMethod',
+            amount: totalAmount,
+            orderId: orderCode.toString(),
+            requestId: orderCode.toString(),
+            extraData: '',
+            autoCapture: true,
+            lang: 'vi',
+            orderExpireTime: 15
+          }
+          paymentResponseData = checkoutData = await this.paymentService.createTransaction(createMomoPaymentDto)
+          break
         // case PaymentMethod.ZALO_PAY:
         // implement later
         case PaymentMethod.PAY_OS:
