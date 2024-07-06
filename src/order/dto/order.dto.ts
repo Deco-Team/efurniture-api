@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { DataResponse, PaginateResponse } from '@src/common/contracts/openapi-builder'
-import { ArrayMinSize, IsMongoId, IsNotEmpty, MaxLength, MinLength, ValidateNested } from 'class-validator'
+import { ArrayMinSize, IsEnum, IsMongoId, IsNotEmpty, MaxLength, MinLength, ValidateNested } from 'class-validator'
 import { CustomerOrderDto, OrderHistoryDto, OrderItemDto } from '@order/schemas/order.schema'
 import { Prop } from '@nestjs/mongoose'
 import { Types } from 'mongoose'
@@ -37,8 +37,8 @@ export class CreateOrderDto {
   items: CreateOrderItemDto[]
 
   @ApiProperty({ enum: PaymentMethod })
-  // @IsNotEmpty()
-  // @IsEnum(PaymentMethod)
+  @IsNotEmpty()
+  @IsEnum(PaymentMethod)
   paymentMethod?: PaymentMethod
 
   @ApiPropertyOptional()
