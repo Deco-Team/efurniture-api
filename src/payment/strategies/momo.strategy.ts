@@ -59,6 +59,7 @@ export class MomoPaymentStrategy implements IPaymentStrategy {
       )
     )
     console.log(data)
+    data.deeplink = encodeURIComponent(data?.deeplink)
     return data
   }
 
